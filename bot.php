@@ -35,14 +35,12 @@ $reply_limit = 3;
 $pass_list = $myBot->ReadData("Pass");
 /* $pass_list は配列 */
 
+if (DEBUG_MODE) echo '============== タイムライン => =================', "\n";
+
 // タイムラインの出力
 foreach ($mentions as $Timeline) {
 
-	if (DEBUG_MODE) {
-		echo '============== タイムライン => =================', "\n";
-		// print_r($Timeline);
-		// echo "================================================\n";
-	}
+	if (DEBUG_MODE) echo "----------------------------------------------------------\n";
 
 	$txt = null;
 
@@ -163,8 +161,10 @@ foreach ($mentions as $Timeline) {
 				// echo '$sid=> ', $sid, "\n";
 				// echo '$uid=> ', $uid, "\n";
 			}
-			
-			$myBot->WriteData($uid . "Count", $reply_cnt);
+
+			$option = array();
+			array_push($option, $reply_cnt, $screen_name, $text);
+			$myBot->WriteData($uid . "Count", $option);
 		}
 	}
 	
@@ -184,7 +184,9 @@ if (DEBUG_MODE) echo "================== タイムラインの出力終了 =====
 // if (DEBUG_MODE) { echo '記録前：$sid=> ', $sid, "\n"; }
 
 // 最後に取得した発言のIDをファイルに記録する
-$myBot->WriteData("Since", $sid);
+$option = array();
+array_push($option, $sid, $screen_name, $text);
+$myBot->WriteData("Since", $option);
 
 // 返信カウンタは30分（1800秒）更新がなければ削除する
 $myBot->DeleteFile("Count", 1800);
@@ -346,6 +348,8 @@ foreach ($mentions as $reply) {
 }
 
 // 最後に取得したリプライのIDをファイルに記録する
-$myBot->WriteData("Mentions", $sid);
+$option = array();
+array_push($option, $sid, $screen_name, $text);
+$myBot->WriteData("Mentions", $option);
 
 

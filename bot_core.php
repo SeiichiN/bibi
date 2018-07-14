@@ -182,7 +182,13 @@ class Bot {
 		return file($dat);
 	}
 
-	// ファイルにデータを書き込むメソッド
+    /* 
+     * WriteData -- ファイルにデータを書き込むメソッド
+     *
+     * $type -- 'Mention' etc..
+     * $data -- array[0] -- $sid (発言IDなど)
+     *               [1] -- $text (発言テキスト)
+     * */
 	function WriteData($type, $data) {
 		// ファイル名の指定
 		$dat = './dat/' . $this->user . '_' . $type . '.dat';
@@ -195,7 +201,9 @@ class Bot {
 		//ファイルを開いてデータを書き込む
 		$fdat = fopen($dat, 'w');
 		flock($fdat, LOCK_EX);
-		fputs($fdat, $data);
+		foreach ($data as $line) {
+			fputs($fdat, $line . "\n");
+		}
 		flock($fdat, LOCK_UN);
 		fclose($fdat);
 	}
