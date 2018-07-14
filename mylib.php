@@ -19,7 +19,7 @@ set_exception_handler('exception_handler');
 function putMsgLog($msg) {
 	$logtime = date('Y-m-d_His');
 	$log = 'log/msg_' . $logtime . '.log';
-	$msg = 'ツイート:' . $msg;
+	$msg = 'ツイート:' . $msg . "\n";
 	return error_log($msg, 3, $log);
 }
 	

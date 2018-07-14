@@ -149,7 +149,7 @@ foreach ($mentions as $Timeline) {
 			// $txt を発言する（返事）
 			$myBot->Post("@" . $screen_name . " " . $txt, $sid);
 			
-			$logText = "@" . $screen_name . " " . $txt . " > $sid";
+			$logText = "@" . $screen_name . " " . $txt . " > $text";
 			putMsgLog($logText);        // ツイートをログに残す
 
 
@@ -210,10 +210,10 @@ if (DEBUG_MODE) {
 error_reporting($level_org);
 
 // ツイートを送信する
-if($text){
-	$myBot->Post($text);
-	putMsgLog($text);        // ツイートをログに残す
-}
+// if($text){
+// 	$myBot->Post($text);
+// 	putMsgLog($text);        // ツイートをログに残す
+// }
 
 /*
  * ===========================================================
