@@ -80,8 +80,13 @@ class Bot {
 // check-end
 		return $result;
 	}
-
-	/* ツイートを送信するメソッド */
+    /**
+     * Post -- ツイートを送信するメソッド
+     *
+     * 相手にリプライする場合
+     * $status -- "@" . $screen_name . " " . $txt(発言文字列)
+     * $req -- $sid(発言id)
+     */
 	function Post($status, $rep = null)
 	{
 		// つぶやく文字列($status)をリクエストパラメータにセットする
@@ -213,6 +218,7 @@ class Bot {
 		// ユーザーID($uid)をリクエストパラメータにセットする
 		$opt = array();
 		$opt['user_id'] = $uid;
+		$opt['follow'] = true;
 		// $flgが「true」ならフォロー、「false」ならリムーブ
 		$req = $this->Request("friendships/" . ($flg ? "create" : "destroy")
 							  . ".json", "POST", $opt);
@@ -229,5 +235,15 @@ class Bot {
 		$result = json_decode($req);
 		return $result;
 	}
+
+	// フォローされているユーザー一覧を取得
+    function Followers($uid) {
+        $opt = array();
+        $opt['user_id'] = $uid;
+        $req = $this->Request("followers/list.json", "GET", $opt);
+        $result = json_decode($req);
+        return $result;
+    }
+    
 	
 }

@@ -17,11 +17,35 @@ $myBot = new Bot($user, $consumer_key, $consumer_secret,
 				 $access_token, $access_token_secret);
 
 
+// ------- フォローしているユーザー ---------
+
 $followList = $myBot->Friends($user);
+
+// if (DEBUB_MODE) {
+// 	var_dump($followList);
+// 	echo "\n";
+// }
 
 echo "----- フォローしているユーザー -----\n";
 
 foreach($followList->users as $list) {
+	// print_r($list);
+
+	echo $list->name, "\n";
+}
+
+// ------- フォローされているユーザー ---------
+
+$followersList = $myBot->Followers($user);
+
+// if (DEBUB_MODE) {
+// 	var_dump($followersList);
+// 	echo "\n";
+// }
+
+echo "----- フォローされているユーザー -----\n";
+
+foreach($followersList->users as $list) {
 	// print_r($list);
 
 	echo $list->name, "\n";
