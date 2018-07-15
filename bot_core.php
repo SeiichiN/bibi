@@ -9,6 +9,9 @@ require_once("util.php");
 // Responderクラスの読み込み
 require_once("responder.php");
 
+// Dictionaryクラスの読み込み
+require_once("dictionary.php");
+
 // Oauthライブラリの読み込み
 require_once("./oauth/autoload.php");
 use Abraham\TwitterOAuth\TwitterOAuth;
@@ -18,6 +21,8 @@ class Bot {
 	/* メンバ変数 */
 	// ユーザー名を格納する変数
 	var $user;
+	// Dictionaryオブジェクトを格納する変数
+	var $dic;
 	// OAuthオブジェクトを格納する変数
 	var $Obj;
 	// Responderオブジェクトを格納する変数
@@ -45,24 +50,28 @@ class Bot {
 									  $oauth_token,
 									  $oauth_token_secret);
 
-		// Responderオブジェクトの生成
+		// Dictionaryオブジェクトの生成
+		$this->dic = new Dictionary();
+		
+		// Responderオブジェクトを生成する際にDictionaryオブジェクトを渡す
+		
 		// $this->responder = new Responder('OneWord');
 		
 		// TimeResponderオブジェクトの生成
-		$this->time_responder = new TimeResponder('Time');
+		$this->time_responder = new TimeResponder('Time', $this->dic);
 		// WhatResponderオブジェクトの生成
-		$this->what_responder = new WhatResponder('What');
+		$this->what_responder = new WhatResponder('What', $this->dic);
 		// GreetingResponderオブジェクトの生成
-		$this->greet_responder = new GreetingResponder('Greeting');
+		$this->greet_responder = new GreetingResponder('Greeting', $this->dic);
 		// PatternResponderオブジェクトの生成
-		$this->pattern_responder = new PatternResponder('Pattern');
+		$this->pattern_responder = new PatternResponder('Pattern', $this->dic);
 
 		
 		// RandomResponderオブジェクトの生成
-		$this->rand_responder = new RandomResponder('Random');
+		$this->rand_responder = new RandomResponder('Random', $this->dic);
 		
 		// RandomResponderを規定のResponderにする
-		// $this->responder = $this->rand_responder;
+		$this->responder = $this->rand_responder;
 	}
 
 	/* リクエストを送信するメソッド */

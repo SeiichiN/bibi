@@ -10,8 +10,9 @@ class Responder {
 	var $name;
 
 	/* コンストラクタ（初期化用メソッド） */
-	function __construct($name) {
+	function __construct($name, $dictionary) {
 		$this->name = $name;
+		$this->dictionary = $dictionary;
 	}
 
 	/* 受け取った文字列をそのまま返すメソッド
@@ -129,38 +130,38 @@ class PatternResponder extends Responder {
 
 	// メンバ変数
 	// ファイルから読み込んだテキストを格納する変数
-	var $pattern = array();
+//	var $pattern = array();
 
 	// コンストラクタ
-	function __construct ($name) {
-		$this->name = $name;
-		// パターン辞書を読み込む
-		$dic = "./dic/PatternDic1.txt";
-		if (!file_exists($dic)) {
-			die("ファイルが開けません。");
-		}
-		// file -- ファイル全体を配列に読み込む
-		$file = file($dic);
+	/* function __construct ($name) {
+	   $this->name = $name;
+	   // パターン辞書を読み込む
+	   $dic = "./dic/PatternDic1.txt";
+	   if (!file_exists($dic)) {
+	   die("ファイルが開けません。");
+	   }
+	   // file -- ファイル全体を配列に読み込む
+	   $file = file($dic);
 
-		// パターン辞書ファイルを連想配列に展開する
-		foreach ($file as $line) {
-			// if (DEBUG_MODE) { var_dump(chop($line)); echo "\n"; }
-			// １行ずつ読み込んで処理
-			// タブで分割したテキストのそれぞれを $key, $val に代入する
-			list($key, $val) = explode("\t", chop($line));
-			// 連想配列に要素を格納する
-			$ptn['pattern'] = $key;
-			$ptn['phrases'] = $val;
-			array_push($this->pattern, $ptn);
-			// if (DEBUG_MODE) var_dump($this->pattern);
-		}
-		
-	}
+	   // パターン辞書ファイルを連想配列に展開する
+	   foreach ($file as $line) {
+	   // if (DEBUG_MODE) { var_dump(chop($line)); echo "\n"; }
+	   // １行ずつ読み込んで処理
+	   // タブで分割したテキストのそれぞれを $key, $val に代入する
+	   list($key, $val) = explode("\t", chop($line));
+	   // 連想配列に要素を格納する
+	   $ptn['pattern'] = $key;
+	   $ptn['phrases'] = $val;
+	   array_push($this->pattern, $ptn);
+	   // if (DEBUG_MODE) var_dump($this->pattern);
+	   }
+	   
+	   }*/
 
 	// パターン辞書をもとに応答メッセージを作るメソッド
 	function Response($text) {
 		// パターン辞書の先頭行から順にパターンマッチをおこなう
-		foreach($this->pattern as $key => $val) {
+		foreach($this->dictionary->pattern() as $key => $val) {
 			// パターンマッチ
 			$ptn = $val['pattern'];
 			// まっちしたら
