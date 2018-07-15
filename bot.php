@@ -20,10 +20,10 @@ $myBot = new Bot($user, $consumer_key, $consumer_secret,
 // ./dat/bot_billie_Since.dat を file()関数で読み込んでいる。
 // ゆえに返り値は配列である。
 $since_id = $myBot->ReadData("Since");
-if (DEBUG_MODE) { echo "最後に取得した発言ID=> ", $since_id[0], "\n"; }
+if (DEBUG_MODE) { echo "前回の最後に取得した発言ID=> ", $since_id[0], "\n"; }
 
 // タイムラインの取得（前回最後に取得したつぶやき以降を取得する）
-$mentions = $myBot->GetTimeline("home_timeline", $since_id[0]);
+$mentions = $myBot->GetTimeline("home_timeline", trim($since_id[0]));
 
 // リプライ済みのユーザーを格納する配列の初期化
 $replied_users = array();
@@ -59,7 +59,7 @@ foreach ($mentions as $Timeline) {
 
 	// if (DEBUG_MODE) { echo '送信元=> ', $source, "\n"; }
 	
-// ユーザーIDの取得（文字列で取得）
+    // ユーザーIDの取得（文字列で取得）
 	$uid = $Timeline->user->id_str;
 	// if(DEBUG_MODE){	echo 'ユーザーID($uid)=> ', $uid, "\n";	}
 	
@@ -88,10 +88,11 @@ foreach ($mentions as $Timeline) {
 		// 	echo '送信元=> ', $source, "\n";
 		// }
         
-        // 返信カウンタファイルの内容を配列に読み込む
+        // 返信カウンタファイル名を取得する
 		$reply_cnt_filename = $myBot->ReadData($uid . "Count", 'f');
 		if (DEBUG_MODE) echo '返信カウンタファイル=> ', $reply_cnt_filename, "\n";
 
+        // 返信カウンタファイルの内容を配列に読み込む
 		if (!empty($reply_cnt_filename))
 			$reply_cnt_file = file($reply_cnt_filename);
 		
@@ -103,7 +104,7 @@ foreach ($mentions as $Timeline) {
 		}
 		// 上限に達したら
 		if ($reply_cnt >= $reply_limit) {
-			$reply_cnt_filename = $myBot->ReadData($uid . "Count", 'f');
+			// $reply_cnt_filename = $myBot->ReadData($uid . "Count", 'f');
 			// 送信カウンタファイルを削除して、返信処理をスキップする
 			unlink($reply_cnt_filename);
 			continue;
@@ -147,7 +148,7 @@ foreach ($mentions as $Timeline) {
 			// $txt を発言する（返事）
 			$myBot->Post("@" . $screen_name . " " . $txt, $sid);
 			
-			$logText = "@" . $screen_name . " " . $txt . " > $text";
+			$logText = "@" . $screen_name . " " . $txt . " > $text \n";
 			putMsgLog($logText);        // ツイートをログに残す
 
 
@@ -184,9 +185,20 @@ if (DEBUG_MODE) echo "================== タイムラインの出力終了 =====
 // if (DEBUG_MODE) { echo '記録前：$sid=> ', $sid, "\n"; }
 
 // 最後に取得した発言のIDをファイルに記録する
-$option = array();
-array_push($option, $sid, $screen_name, $text);
-$myBot->WriteData("Since", $option);
+/* $option = array();
+ * array_push($option, $sid, $screen_name, $text);
+ * $myBot->WriteData("Since", $option);
+ * */
+if (!empty($sid)) {
+    $option = array();
+    array_push($option, $sid, $screen_name, $text);
+    $myBot->WriteData("Since", $option);
+    
+    if (DEBUG_MODE) { echo "最後に取得した発言ID \n $sid \n $screen_name \n $text \n"; }
+} else {
+    if (DEBUG_MODE) { echo "新しく取得した発言はありませんでした。\n"; }
+}
+
 
 // 返信カウンタは30分（1800秒）更新がなければ削除する
 $myBot->DeleteFile("Count", 1800);
@@ -229,10 +241,10 @@ if (DEBUG_MODE) {
 // 最後に取得したリプライのIDを取得する
 $since_id = $myBot->ReadData("Mentions");
 
-if (DEBUG_MODE) { echo '最後に取得したリプライ $since_id=> ', $since_id[0], "\n"; }
+if (DEBUG_MODE) { echo '前回の最後に取得したリプライ $since_id=> ', $since_id[0], "\n"; }
 
 // ボット宛のリプライの取得（前回最後に取得したリプライ以降を取得する）
-$mentions = $myBot->GetTimeline("mentions_timeline", $since_id[0]);
+$mentions = $myBot->GetTimeline("mentions_timeline", trim($since_id[0]));
 
 
 if (DEBUG_MODE) echo "==============> ボット宛のリプライ処理 <======================\n";
@@ -279,6 +291,18 @@ foreach ($mentions as $reply) {
 		if (DEBUG_MODE) {
 			echo '---------- フォロー処理 ---------------' . "\n";
 		}
+
+        $followList = $myBot->Friends($uid);
+        foreach ($followList->users as $list) {
+            if ($list->id_str == $uid) {
+                $txt = "@" . $screen_name . "さん、もうフォローしてますけど。";
+                if (DEBUG_MODE) { echo "$screen_name さんはもうフォローしてました。\n"; }
+                continue 2;
+            }
+        }
+        
+
+        
 		// フォローする
 		$result = $myBot->Follow($uid, true);
 
@@ -318,8 +342,22 @@ foreach ($mentions as $reply) {
 			echo 'リムーブ処理<br>' . "\n";
 		}
 
+        $follow = 0;
+        $followList = $myBot->Friends($uid);
+        foreach ($followList->users as $list) {
+            if ($list->id_str == $uid) {
+                $follow = 1;
+            }
+        }
+
+        if ($follow == 0) {
+            $txt = "@" . $screen_name . "さん、フォローしてませんけど。";
+            if (DEBUG_MODE) { echo "$screen_name さんはフォローしてないので、リムーブしませんでした。\n"; }
+            continue;
+        }
+        
 		// りむーぶする
-		$result = $myBot->Follow($uid, false);
+		if ($follow) $result = $myBot->Follow($uid, false);
         // if (DEBUG_MODE) { var_dump($result); die(); }
 
         // エラーメッセージの表示
@@ -344,12 +382,26 @@ foreach ($mentions as $reply) {
 	// $txtが空でなかったら、送信する
 	if ($txt) {
 		$myBot->Post("@" . $screen_name . " " . $txt, $sid);
+
+        $logText = "@" . $screen_name . " " . $txt . "\n";
+		putMsgLog($logText);        // ツイートをログに残す
+
 	}
 }
 
 // 最後に取得したリプライのIDをファイルに記録する
-$option = array();
-array_push($option, $sid, $screen_name, $text);
-$myBot->WriteData("Mentions", $option);
+/* $option = array();
+ * array_push($option, $sid, $screen_name, $text);
+ * $myBot->WriteData("Mentions", $option);
+ * */
 
+if (!empty($sid)) { 
+    $option = array();
+    array_push($option, $sid, $screen_name, $text);
+    $myBot->WriteData("Mentions", $option);
+    
+    if (DEBUG_MODE) { echo "最後に取得したリプライのID \n $sid \n $screen_name \n $text \n"; }
+} else {
+    if (DEBUG_MODE) { echo "リプライはありませんでした。\n"; }
+}
 

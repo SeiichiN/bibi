@@ -158,7 +158,7 @@ class Bot {
 		// PHP配列に変換する
 		$result = json_decode($req);
 		// エラー処理
-		if (!is_array($result)) {die('Error');}
+		if (!is_array($result)) {die("Error\n");}
 		// 配列を逆順にして返す
 		return array_reverse($result);
 	}
