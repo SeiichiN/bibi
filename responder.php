@@ -22,7 +22,7 @@ class Responder {
 	   こちらのメソッドの名前を変えておいた
 	   by Seiichi Nukayama 2017.02.11 */
 //	function MirrorResponse($text) {
-	function Response($text) {
+	function Response($text, $mood) {
 		return $text;
 	}
 
@@ -36,7 +36,7 @@ class Responder {
 class TimeResponder extends Responder {
 
 	// 現在時によって送信する言葉をセットするメソッド
-	function Response($text) {
+	function Response($text, $mood) {
 		$hour = date("G");
 		
 		switch ($hour) {
@@ -93,7 +93,7 @@ class RandomResponder extends Responder {
 
 	
 	// 読み込んだ辞書ファイルからランダムに文字列を取り出すメソッド
-	function Response($text) {
+	function Response($text, $mood) {
 		$res = $this->text[rand(0, count($this->text) - 1)];
 		// 改行コードを取り除く
 		return rtrim($res, "\n");
@@ -104,7 +104,7 @@ class RandomResponder extends Responder {
 class WhatResponder extends Responder {
 
 	// 受け取った文字列に「って何？」をつけて返すメソッド
-	function Response($text) {
+	function Response($text, $mood) {
 		return $text . 'って何？';
 	}
 }
@@ -113,7 +113,7 @@ class WhatResponder extends Responder {
 class GreetingResponder extends Responder {
 
 	// 発言に挨拶文が含まれていたら、対応する挨拶を返すメソッド
-	function Responder($text) {
+	function Responder($text, $mood) {
 		if (preg_match("/おは(よ)?(う|ー|～)/", $text)) {
 			$txt = "おはようございます";}
 		if (preg_match("/こんにち(は|わ)/", $text)) {
@@ -128,47 +128,13 @@ class GreetingResponder extends Responder {
 // PatternResponderクラスの定義
 class PatternResponder extends Responder {
 
-	// メンバ変数
-	// ファイルから読み込んだテキストを格納する変数
-//	var $pattern = array();
-
-	// コンストラクタ
-	/* function __construct ($name) {
-	   $this->name = $name;
-	   // パターン辞書を読み込む
-	   $dic = "./dic/PatternDic1.txt";
-	   if (!file_exists($dic)) {
-	   die("ファイルが開けません。");
-	   }
-	   // file -- ファイル全体を配列に読み込む
-	   $file = file($dic);
-
-	   // パターン辞書ファイルを連想配列に展開する
-	   foreach ($file as $line) {
-	   // if (DEBUG_MODE) { var_dump(chop($line)); echo "\n"; }
-	   // １行ずつ読み込んで処理
-	   // タブで分割したテキストのそれぞれを $key, $val に代入する
-	   list($key, $val) = explode("\t", chop($line));
-	   // 連想配列に要素を格納する
-	   $ptn['pattern'] = $key;
-	   $ptn['phrases'] = $val;
-	   array_push($this->pattern, $ptn);
-	   // if (DEBUG_MODE) var_dump($this->pattern);
-	   }
-	   
-	   }*/
-
 	// パターン辞書をもとに応答メッセージを作るメソッド
-	function Response($text) {
+	function Response($text, $mood) {
 		// パターン辞書の先頭行から順にパターンマッチをおこなう
-		foreach($this->dictionary->pattern() as $key => $val) {
-			// パターンマッチ
-			$ptn = $val['pattern'];
-			// まっちしたら
-			if (preg_match("/" . $ptn . "/", $text)) {
-				// 応答例をランダムに選択して返す
-				$phrases = explode("|", $val['phrases']);
-				$res = $phrases[rand(0, count($phrases) - 1)];
+		foreach($this->dictionary->Pattern() as $ptn_item) {
+			if ($ptn = $ptn_item->Match($text)) {
+				$res = $ptn_item->Choice($mood);
+				if ($res == null) next;
 				// 応答例に「%match%/」という文字列があったら、マッチした文字列を置き換える
 				return preg_replace("/%match%/", $ptn, $res);
 			}

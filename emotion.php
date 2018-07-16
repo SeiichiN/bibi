@@ -26,6 +26,10 @@ class Emotion {
 	}
 
 	// 会話によって機嫌値を変動させるメソッド
+	/* $input -- 入力文（ユーザーの入力した会話文
+     * パターン辞書のパターンと照合し、もしマッチしたら、
+     * 機嫌値($this->mood)を変動させて、保存する。
+	 */
 	function Update($input) {
 		// パターン辞書の要素を繰り返し処理する
 		foreach ($this->dictionary->Pattern() as $ptn_item) {
@@ -49,7 +53,12 @@ class Emotion {
 		$this->Save_mood($this->mood);
 	}
 
-	// 機嫌値を変動させるメソッド
+    /* 
+	 *  機嫌値を変動させるメソッド
+     *  引数: int $val
+     *  返り値: なし
+     *  メンバ変数の $this->mood の値を変える。（$valを加算）
+     */
 	function Adjust_mood($val) {
 		// 機嫌変動値($val)によって機嫌値を変動させる
 		$this->mood += $val;
@@ -61,7 +70,11 @@ class Emotion {
 		}
 	}
 
-	// 機嫌値(mood)をファイルから読み込むメソッド
+	/**
+     * 機嫌値(mood)をファイルから読み込むメソッド
+     *   fgets -- 1行読み込む
+     * 返り値: string $mood  (数字が入っている)
+	 */
 	function Load_mood() {
 		$dat = "./dat/mood.dat";
 		if (!file_exists($dat)) {
@@ -74,7 +87,10 @@ class Emotion {
 		fclose($fdat);
 		return $mood;
 	}
-	// 機嫌値($mood)をファイルに書き込むメソッド
+	/**
+     * 機嫌値($mood)をファイルに書き込むメソッド
+     * 返り値: bool true / false
+     */
 	function Save_mood($data) {
 		$dat = "./dat/mood.dat";
 		if (!file_exists($dat)) {
@@ -85,10 +101,10 @@ class Emotion {
 		flock($fdat, LOCK_EX);
 		fputs($fdat, $data);
 		flock($fdat, LOCK_UN);
-		fclose($fdat);
+		return fclose($fdat);
 	}
 
-	// 現在の機嫌値を取得するメソッド
+	// 現在の機嫌値を取得するメソッド（ゲッター）
 	function Mood() {
 		return $this->mood;
 	}

@@ -16,6 +16,12 @@ require_once("dictionary.php");
 require_once("./oauth/autoload.php");
 use Abraham\TwitterOAuth\TwitterOAuth;
 
+// Dictionaryクラスの読み込み
+require_once("dictionary.php");
+
+// Emotionクラスの読み込み
+require_once("emotion.php");
+
 /* Botクラスの定義 */
 class Bot {
 	/* メンバ変数 */
@@ -37,6 +43,8 @@ class Bot {
 	var $greet_responder;
 	// PatternResponderオブジェクトを格納する変数
 	var $pattern_responder;
+	// Emotionオブジェクトを格納する変数
+	var $emotion;
 
 	/* コンストラクタ（初期化用メソッド） */
 	function __construct($usr, $consumer_key, $consumer_secret,
@@ -52,6 +60,9 @@ class Bot {
 
 		// Dictionaryオブジェクトの生成
 		$this->dic = new Dictionary();
+
+		// Emotionオブジェクトの生成
+		$this->emotion = new Emotion($this->dic);
 		
 		// Responderオブジェクトを生成する際にDictionaryオブジェクトを渡す
 		
@@ -132,10 +143,14 @@ class Bot {
 		
 		// PatternResponderをResponder に設定する
 		$this->responder = $this->pattern_responder;
+
+		// パターンマッチをおこない、感情を変動させる
+		$this->emotion->Update($input);
 		
 		// Responseを返す
 		// $this->responder = $this->what_responder;
-		return $this->responder->Response($input);
+		// $this->emotion->mood -- 現在の機嫌値
+		return $this->responder->Response($input, $this->emotion->mood);
 	}
 
 	/* Responderオブジェクトの名前を返すメソッド */
