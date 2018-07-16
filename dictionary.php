@@ -6,7 +6,24 @@
 define("PATTERN_DIC", "./dic/PatternDic2.txt");
 define("SEPARATOR", "/^((-?\d+)##)?(.*)$/");
 
-// Dictionaryクラスの定義
+/* 
+ * Dictionaryクラスの定義
+ *
+ * $pattern
+ *   [ 'pattern' => <パターン>, 'modify' => <数値>, 'phrases' => 配列 ]
+ * phrases
+ *   [ 'need' => <数値>, 'phrase' => <string> ]
+ *
+ * （例）$pattern の一部
+ *     [0] [pattern] => バカ|ばか|馬鹿,
+ *         [modify] => -15,
+ *         [phrases] [0] [need] => -10, [phrase] => なんですって!
+ *                   [1] [need] => -5,  [phrase] => 馬鹿じゃないもん!
+ *                   [2] [need] => 1,   [phrase] => なんか言った？
+ *                   [3] [need] => 5,   [phrase] => 馬鹿なんていっちゃいやだよ
+ *                   [4] [need] => 10,  [phrase] => 冗談でしょ？
+ *                   [5] [need] => 10,  [phrase] => またまたー。
+ * */
 class Dictionary {
 
     // メンバ変数
@@ -110,19 +127,39 @@ class PatternItem {
              * )
              * */
             preg_match(SEPARATOR, $phrase, $regex);
-            // if (DEBUG_MODE) { print_r($regex); echo "\n"; die(); }
+            
             $ph['need'] = intval($regex[2]);
             $ph['phrase'] = $regex[3];
             array_push($this->phrases, $ph);
         }
     }
 
-    // パターンマッチをおこなうメソッド
+    /*
+     * パターンマッチをおこなうメソッド
+     * @params: string $str
+     *   たとえば、以下のパターンと照合する。
+     *     $this->pattern -- -15##バカ|ばか|馬鹿
+	 */
     function Match($str) {
         return preg_match("/". $this->pattern . "/", $str);
     }
 
-    // 現在の機嫌値($mood)によって応答例を選択するメソッド
+    /*
+     * 現在の機嫌値($mood)によって応答例を選択するメソッド
+     * <例>
+     *  >かわいいね。
+     *  Bot(Pattern-機嫌値[-6.5])>いまさら褒めたってゆるさない!
+     *  >いやいや、ほんとにかわいいよ。
+     *  Bot(Pattern-機嫌値[-1])>かわいくないもん!
+     *  >絶対、かわいいよ。
+     *  Bot(Pattern-機嫌値[3.5])>あら、ありがとう
+     *  >サイコー、かわいいよ。
+     *  Bot(Pattern-機嫌値[8])>うれしいよ!
+     *  >とても、かわいいよ。
+     *  Bot(Pattern-機嫌値[12.5])>うれしいよ!
+     *  >いいね。かわいい。
+     *  Bot(Pattern-機嫌値[14.5])>今度、デートしよう!
+     */
     function Choice($mood) {
         // 応答例の候補を配列に格納する
         $choice = array();
