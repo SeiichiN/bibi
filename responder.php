@@ -125,7 +125,18 @@ class GreetingResponder extends Responder {
 }
 
 
-// PatternResponderクラスの定義
+/*
+ * PatternResponderクラスの定義
+ *
+ * $ptn_item
+ * { ["pattern"]=> "バカ|ばか|馬鹿",
+ * 		["modify"]=> -15,
+ * 		["phrases"]=> { [0]=> { ["need"] => -10, ["phrase"] => "なんですって!" },
+ * 						[1]=> { ["need"] =>  -5, ["phrase"] => "馬鹿じゃないもん!" },
+ * 						[2]=> { ["need"] =>   1, ["phrase"] => "なんか言った？" },
+ * 						[3]=> { ["need"] =>   5, ["phrase"] => "冗談でしょ？" },
+ * 						[4]=> { ["need"] =>  10, ["phrase"] => "またまたー。" } }
+ */
 class PatternResponder extends Responder {
 
 	// パターン辞書をもとに応答メッセージを作るメソッド
