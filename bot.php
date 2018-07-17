@@ -133,9 +133,12 @@ foreach ($mentions as $Timeline) {
 
 			// echo '$user=> ' , $user, 'スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
 		}
+
+		// 現在の機嫌値をファイルから読み込んでセットする
+		if (MOOD_MODE) { $myBot->emotion->User_mood($uid); }
 		
 		// 送信する文字列を取得する（現在、パターンによる返事）
-		$txt = $myBot->Conversation($text);
+		$txt = $myBot->Conversation($text, $user);
 
 		// コマンドプロンプトでの出力確認用
 		if (DEBUG_MODE) {

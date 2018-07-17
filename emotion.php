@@ -16,13 +16,15 @@ class Emotion {
 	var $dictionary;
 	// 現在の機嫌値を格納する変数
 	var $mood;
+	// ユーザーIDを格納する変数
+	var $uid;
 
 	// コンストラクタ
 	function __construct($dictionary) {
 		// パターン辞書オブジェクトを格納する
 		$this->dictionary = $dictionary;
 		// 現在の機嫌値を読み込む
-		$this->mood = $this->Load_mood();
+		$this->mood = $this->Load_mood("");
 	}
 
 	// 会話によって機嫌値を変動させるメソッド
@@ -50,7 +52,7 @@ class Emotion {
 			$this->mood -= MODE_RECOVERY;
 		}
 		// 現在の機嫌値を保存する
-		$this->Save_mood($this->mood);
+		$this->Save_mood($this->mood, $this->uid);
 	}
 
     /* 
@@ -73,10 +75,12 @@ class Emotion {
 	/**
      * 機嫌値(mood)をファイルから読み込むメソッド
      *   fgets -- 1行読み込む
-     * 返り値: string $mood  (数字が入っている)
+     * @params: string $uid -- ユーザーID
+     *
+     * @rerutn: string $mood  (数字が入っている)
 	 */
-	function Load_mood() {
-		$dat = "./dat/mood.dat";
+	function Load_mood($uid) {
+		$dat = "./dat/" . $uid . "_mood.dat";
 		if (!file_exists($dat)) {
 			touch($dat);
 			chmod($dat, 0666);
@@ -89,10 +93,12 @@ class Emotion {
 	}
 	/**
      * 機嫌値($mood)をファイルに書き込むメソッド
-     * 返り値: bool true / false
+     * @params: $data -- おそらくint
+     *          string $uid -- ユーザーID
+     * @return: bool true / false
      */
-	function Save_mood($data) {
-		$dat = "./dat/mood.dat";
+	function Save_mood($data, $uid) {
+		$dat = "./dat/" . $uid . "_mood.dat";
 		if (!file_exists($dat)) {
 			touch($dat);
 			chmod ($dat, 0666);
@@ -108,4 +114,18 @@ class Emotion {
 	function Mood() {
 		return $this->mood;
 	}
+
+	/**
+	 * ユーザーごとの機嫌値を読み込むメソッド
+     *   $this->mood の値を設定する
+     *
+     * @params: string $uid -- ユーザーID
+     * 
+     * @return: none
+	 */
+	function User_mood($uid) {
+        $this->uid = $uid;
+        $this->mood = $this->Load_mood($this->uid);
+    }
+    
 }
