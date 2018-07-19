@@ -25,7 +25,9 @@ if (DEBUG_MODE) { echo "前回の最後に取得した発言ID=> ", $since_id[0]
 // タイムラインの取得（前回最後に取得したつぶやき以降を取得する）
 $mentions = $myBot->GetTimeline("home_timeline", trim($since_id[0]));
 
-// リプライ済みのユーザーを格納する配列の初期化
+if (DEBUG_MODE) {var_dump($mentions); echo "\n"; }
+
+// リプライ済みのユーザーを格納する配列の初期
 $replied_users = array();
 
 // ボット相手に返信する上限回数
@@ -131,7 +133,7 @@ foreach ($mentions as $Timeline) {
 	    if (DEBUG_MODE) {
 			echo "---------------- 相互フォローの発言 あるいは、ボット宛 ------------------ \n";
 
-			// echo '$user=> ' , $user, 'スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
+			echo '>>> $user=> ' , $user, ' スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
 		}
 
 		// 現在の機嫌値をファイルから読み込んでセットする
