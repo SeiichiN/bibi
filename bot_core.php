@@ -51,6 +51,10 @@ class Bot {
 				 $oauth_token, $oauth_token_secret)
 	{
 		$this->user = $usr;
+		$this->consumer_key = $consumer_key;
+		$this->consumer_secret = $consumer_secret;
+		$this->oauth_token = $oauth_token;
+		$this->oauth_token_secret = $oauth_token_secret;
 
 		// OAuthオブジェクトの生成
 		$this->Obj = new TwitterOAuth($consumer_key,
@@ -276,6 +280,19 @@ class Bot {
         $result = json_decode($req);
         return $result;
     }
-    
+
+	// 機嫌値によってプロフィール画像を変更するメソッド
+	function ProfileImage() {
+		$no = round(($this->emotion->mood + 15) / 6);
+		$image = "./img/bot_" . $no . ".png";
+
+//		$req = Util::ImageRequest($image);
+
+		$req = Util::ImageRequest($this->consumer_key,
+								  $this->consumer_secret,
+								  $this->oauth_token,
+								  $this->oauth_token_secret,
+								  $image);
+	}
 	
 }

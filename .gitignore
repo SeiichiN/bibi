@@ -1,4 +1,7 @@
 *.php~
 ini.php
 *.log
+trash
+set_profile_image.php
+mentions.txt
 

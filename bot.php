@@ -25,7 +25,7 @@ if (DEBUG_MODE) { echo "前回の最後に取得した発言ID=> ", $since_id[0]
 // タイムラインの取得（前回最後に取得したつぶやき以降を取得する）
 $mentions = $myBot->GetTimeline("home_timeline", trim($since_id[0]));
 
-if (DEBUG_MODE) {var_dump($mentions); echo "\n"; }
+// if (DEBUG_MODE) {var_dump($mentions); echo "\n"; die(); }
 
 // リプライ済みのユーザーを格納する配列の初期
 $replied_users = array();
@@ -133,7 +133,7 @@ foreach ($mentions as $Timeline) {
 	    if (DEBUG_MODE) {
 			echo "---------------- 相互フォローの発言 あるいは、ボット宛 ------------------ \n";
 
-			echo '>>> $user=> ' , $user, ' スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
+			echo '>>> スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
 		}
 
 		// 現在の機嫌値をファイルから読み込んでセットする
@@ -144,8 +144,9 @@ foreach ($mentions as $Timeline) {
 
 		// コマンドプロンプトでの出力確認用
 		if (DEBUG_MODE) {
-            echo "レスポンス文=> ";
-			Util::Debug_print($txt);
+			if (empty($txt)) echo "レスポンス文=> （空） \n";
+            else echo "レスポンス文=> $txt \n";
+			// Util::Debug_print($txt);
 		}
 
 		// $txt が空でなかったら送信する
@@ -187,7 +188,10 @@ foreach ($mentions as $Timeline) {
 if (DEBUG_MODE) echo "================== タイムラインの出力終了 ===================== \n";
 
 
-// if (DEBUG_MODE) { echo '記録前：$sid=> ', $sid, "\n"; }
+if (DEBUG_MODE) echo ">>>>> プロファイル画像を更新するよ <<<<< \n";
+
+// プロフィール画像を更新する
+$myBot->ProfileImage();
 
 // 最後に取得した発言のIDをファイルに記録する
 /* $option = array();
