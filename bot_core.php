@@ -15,6 +15,9 @@ require_once("dictionary.php");
 // Emotionクラスの読み込み
 require_once("emotion.php");
 
+// morphemeクラスの読み込み
+require_once("morpheme.php");
+
 // Oauthライブラリの読み込み
 require_once("./oauth/autoload.php");
 use Abraham\TwitterOAuth\TwitterOAuth;
@@ -137,7 +140,7 @@ class Bot {
 	}
 
 	/* テキストをResponderオブジェクトに渡すメソッド（リプライ用） */
-	function Conversation($input, $uid)
+	function Conversation($input, $uid = NULL)
 	{
 		// GreetingResponderをResponder に設定する
 		// $this->responder = $this->greet_responder;
@@ -151,15 +154,21 @@ class Bot {
 		// パターンマッチをおこない、感情を変動させる
 		$this->emotion->Update($input, $uid);
 
+		// 形態素解析の結果を取得する
+		$m = new Yahoo_morph();
+		$words = $m->Request($input);
+
 		// Studyメソッドにテキストを渡して学習する
-		$this->dic->Study($input);
+		// 引数 $words で形態素解析の結果を渡す
+		$this->dic->Study($input, $words);
 
 		$this->save();  // 辞書ファイルの保存
 		
 		// Responseを返す
 		// $this->responder = $this->what_responder;
 		// $this->emotion->mood -- 現在の機嫌値
-		return $this->responder->Response($input, $this->emotion->mood);
+		$res = $this->responder->Response($input, $this->emotion->mood);
+		return $res;
 	}
 
 	/* Responderオブジェクトの名前を返すメソッド */
@@ -301,6 +310,20 @@ class Bot {
 	// Dictionaryオブジェクトの Save メソッドにアクセスするためのメソッド
 	function Save() {
 		$this->dic->Save();
+	}
+
+	// 形態素解析をおこなう
+	function Morph($input) {
+		// 形態素解析の結果を取得する
+		$m = new Yahoo_morph();
+		$words = $m->Request($input);
+
+		// Studyメソッドにテキストを渡して学習する
+		// 引数 $words で形態素解析の結果を渡す
+		$this->dic->Study($input, $words);
+
+		$this->save();  // 辞書ファイルの保存
+		
 	}
 	
 }

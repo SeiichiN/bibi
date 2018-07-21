@@ -225,4 +225,47 @@ class Util {
     }
 
 }
-?>
+
+/**
+ * Web_API -- 形態素解析のために使用するクラス -- morpheme.php
+ */
+class Web_API {
+
+	var $res;  // 取得結果を格納する
+	var $name;  // オブジェクト名を格納
+
+	function __construct($name) {
+		$this->name = $name;
+	}
+
+	// Web API のリクエストURLを生成するメソッド
+	function Request($url, $params) {
+
+		// パラメータと値をURLエンコードする
+		$encoded_params = array();
+		foreach ($params as $k => $v) {
+			$encoded_params[] = urlencode($k) . "=" . urlencode($v);
+		}
+
+		// パラメータを「&」で連結する
+		$req = $url . "?" . join('&', $encoded_params);
+		// Load_fileメソッドの実行結果を返す
+		return $this->res = $this->Load_file($req);
+	}
+
+	// リクエストを送信して結果を取得するメソッド
+	function Load_file($req) {
+		return simplexml_load_file($req);
+	}
+}
+
+/**
+ * Get_content -- Web_APIクラスを継承
+ */
+class Get_content extends Web_API {
+
+	// リクエストを送信して結果を取得するメソッド
+	function Load_file($req) {
+		return file_get_contents($req);
+	}
+}

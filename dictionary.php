@@ -77,6 +77,37 @@ class Dictionary {
         return $this->pattern;
     }
 
+	// パターン辞書の学習メソッド
+	function Study_Pattern($text, $words) {
+		foreach ($words as $k => $v) {
+			//名刺でなかったら処理しない
+			if (!(preg_match("/名詞/", $v->pos))) { continue; }
+			// キーワードの重複チェック
+			foreach ($this->pattern as $ptn_item) {
+				$s = preg_match("/".$v->surface."/", $ptn_item->pattern);
+				$r = preg_match("/".$v->reading."/", $ptn_item->pattern);
+				if ($s == 1 || $r == 1) {
+					// 重複ありなら Add_phraseメソッドを実行する
+					$p = $ptn_item->Add_phrase($text);
+					continue 2;
+				}
+			}
+			
+			// 重複なしならキーワードと応答例を辞書に追加する
+			// 読みがなが同じでなかったら
+			if ($v->surface != $v->reading) {
+				// 読みがなもキーワードとして登録する
+				$key = $v->surface."|".$v->reading;
+			} else {
+				$key = $v->surface;
+			}
+			$patternitem = new PatternItem($key, $text);
+			// PatternItemオブジェクトのハッシュに格納する
+			array_push($this->pattern, $patternitem);
+		}
+	}
+			
+
 	// ランダム辞書ファイルを読み込むメソッド
 	function RandomLoad() {
 		$dic = RANDOM_DIC;
@@ -95,8 +126,12 @@ class Dictionary {
     }
 
     // 辞書の学習メソッドを実行
-    function Study($text) {
+    function Study($text, $words) {
+		// ランダム辞書に、発言($text)を追加する
         $this->Study_Random($text);
+
+		// パターン辞書に形態素解析の結果を追加する
+		$this->Study_Pattern($text, $words);
     }
 
     // ランダム辞書の学習メソッド
@@ -107,8 +142,10 @@ class Dictionary {
         array_push($this->random, $text);
     }
 
-    // ランダム辞書のハッシュをファイルに保存する
+    // 辞書のハッシュをファイルに保存する
     function Save() {
+		
+		// ランダム辞書の保存
         $dat = RANDOM_DIC;
 		if (!file_exists($dat)) {
 			$msg = "$dat ファイルが開けません\n";
@@ -122,12 +159,31 @@ class Dictionary {
         }
         flock($fdat, LOCK_UN);
         fclose($fdat);
+
+		// パターン辞書の保存
+		$dat = PATTERN_DIC;
+		if (!file_exists($dat)) {
+			$msg = "$dat ファイルが開けません";
+			putErrLog($msg);
+			die($msg);
+		}
+        $fdat = fopen($dat, 'w');
+        flock($fdat, LOCK_EX);
+        foreach($this->pattern as $ptn_item) {
+			// Make_lineメソッドでハッシュから1行分のデータを生成する
+            fputs($fdat, $ptn_item->Make_line() . "\n");
+        }
+        flock($fdat, LOCK_UN);
+        fclose($fdat);
+
     }
 
     // ランダム辞書にアクセスするためのメドッド
     function Random() {
         return $this->random;
     }
+
+	
 }
 
 // PaternItemクラスの定義
@@ -244,4 +300,33 @@ class PatternItem {
             return FALSE;
         }
     }
+
+	// 応答例の重複をチェックするメソッド
+	function Add_phrase($text) {
+		// 応答例の中にテキスト($text)と重複する内容があるかどうかをチェックする
+		foreach ($this->phrases as $p) {
+
+			// 重複していたら何もしない
+			if ($p[phrase] == $text) { return; }
+		}
+
+		// 重複する応答例がなかったら、応答例にテキストを追加する
+		$ph['need'] = 0;        // 追加する応答例の必要機嫌値は 0 にする
+		$ph['phrase'] = $text;
+		array_push($this->phrases, $ph);
+	}
+
+	// パターン辞書のハッシュからファイル1行分のデータを生成する
+	function Make_line() {
+		$ph = array();
+		$pattern = $this->modify."##".$this->pattern;
+		foreach ($this->phrases as $p ) {
+			$phrases = $p[need]."##".$p[phrase];
+			array_push($ph, $phrases);
+		}
+		return $pattern."\t".join("|", $ph);
+	}
+	
 }
+	
+

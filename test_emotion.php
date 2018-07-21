@@ -6,9 +6,11 @@
 //初期設定ファイルの読み込み
 require_once("ini.php");
 
-
 //Botクラスの読み込み
 require_once("bot_core.php");
+
+// mylib.php
+require_once("mylib.php");
 
 
 //Botオブジェクトの生成
@@ -24,17 +26,14 @@ while (1) {
 	print(">");
  	$input = trim(fgets($stdin, 256));
 
-	if($input == "exit") {
-		$myBot->Save();	//辞書を保存
-		break;
-	}
+	if($input == "exit") break;
 
 	$text = mb_convert_encoding($input, "UTF-8", "auto");
 
 	//送信する文字列の取得
 	$txt = $myBot->Conversation($text);
 
-	$txt = "Bot(".$myBot->ResponderName()."-機嫌値[".$myBot->emotion->mood."])>".$txt;
+	$txt = "Bot(" . $myBot->ResponderName() . "-機嫌値[" . $myBot->emotion->mood . "])>" . $txt;
 	Util::Debug_print($txt);
 
 }
