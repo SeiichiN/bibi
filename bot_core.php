@@ -9,6 +9,12 @@ require_once("util.php");
 // Responderクラスの読み込み
 require_once("responder.php");
 
+// Dictionaryクラスの読み込み
+require_once("dictionary.php");
+
+// Emotionクラスの読み込み
+require_once("emotion.php");
+
 // Oauthライブラリの読み込み
 require_once("./oauth/autoload.php");
 use Abraham\TwitterOAuth\TwitterOAuth;
@@ -18,6 +24,8 @@ class Bot {
 	/* メンバ変数 */
 	// ユーザー名を格納する変数
 	var $user;
+	// Dictionaryオブジェクトを格納する変数
+	var $dic;
 	// OAuthオブジェクトを格納する変数
 	var $Obj;
 	// Responderオブジェクトを格納する変数
@@ -32,12 +40,18 @@ class Bot {
 	var $greet_responder;
 	// PatternResponderオブジェクトを格納する変数
 	var $pattern_responder;
+	// Emotionオブジェクトを格納する変数
+	var $emotion;
 
 	/* コンストラクタ（初期化用メソッド） */
 	function __construct($usr, $consumer_key, $consumer_secret,
 				 $oauth_token, $oauth_token_secret)
 	{
 		$this->user = $usr;
+		$this->consumer_key = $consumer_key;
+		$this->consumer_secret = $consumer_secret;
+		$this->oauth_token = $oauth_token;
+		$this->oauth_token_secret = $oauth_token_secret;
 
 		// OAuthオブジェクトの生成
 		$this->Obj = new TwitterOAuth($consumer_key,
@@ -45,24 +59,31 @@ class Bot {
 									  $oauth_token,
 									  $oauth_token_secret);
 
-		// Responderオブジェクトの生成
+		// Dictionaryオブジェクトの生成
+		$this->dic = new Dictionary();
+
+		// Emotionオブジェクトの生成
+		$this->emotion = new Emotion($this->dic);
+		
+		// Responderオブジェクトを生成する際にDictionaryオブジェクトを渡す
+		
 		// $this->responder = new Responder('OneWord');
 		
 		// TimeResponderオブジェクトの生成
-		$this->time_responder = new TimeResponder('Time');
+		$this->time_responder = new TimeResponder('Time', $this->dic);
 		// WhatResponderオブジェクトの生成
-		$this->what_responder = new WhatResponder('What');
+		$this->what_responder = new WhatResponder('What', $this->dic);
 		// GreetingResponderオブジェクトの生成
-		$this->greet_responder = new GreetingResponder('Greeting');
+		$this->greet_responder = new GreetingResponder('Greeting', $this->dic);
 		// PatternResponderオブジェクトの生成
-		$this->pattern_responder = new PatternResponder('Pattern');
+		$this->pattern_responder = new PatternResponder('Pattern', $this->dic);
 
 		
 		// RandomResponderオブジェクトの生成
-		$this->rand_responder = new RandomResponder('Random');
+		$this->rand_responder = new RandomResponder('Random', $this->dic);
 		
 		// RandomResponderを規定のResponderにする
-		// $this->responder = $this->rand_responder;
+		$this->responder = $this->rand_responder;
 	}
 
 	/* リクエストを送信するメソッド */
@@ -116,17 +137,29 @@ class Bot {
 	}
 
 	/* テキストをResponderオブジェクトに渡すメソッド（リプライ用） */
-	function Conversation($input)
+	function Conversation($input, $uid)
 	{
 		// GreetingResponderをResponder に設定する
 		// $this->responder = $this->greet_responder;
 		
 		// PatternResponderをResponder に設定する
 		$this->responder = $this->pattern_responder;
+
+		// 宛先のユーザー名を消す
+		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));
+
+		// パターンマッチをおこない、感情を変動させる
+		$this->emotion->Update($input, $uid);
+
+		// Studyメソッドにテキストを渡して学習する
+		$this->dic->Study($input);
+
+		$this->save();  // 辞書ファイルの保存
 		
 		// Responseを返す
 		// $this->responder = $this->what_responder;
-		return $this->responder->Response($input);
+		// $this->emotion->mood -- 現在の機嫌値
+		return $this->responder->Response($input, $this->emotion->mood);
 	}
 
 	/* Responderオブジェクトの名前を返すメソッド */
@@ -252,6 +285,24 @@ class Bot {
         $result = json_decode($req);
         return $result;
     }
-    
+
+	// 機嫌値によってプロフィール画像を変更するメソッド
+	function ProfileImage() {
+		$no = round(($this->emotion->mood + 15) / 6);
+		$image = "./img/bot_" . $no . ".png";
+
+//		$req = Util::ImageRequest($image);
+
+		$req = Util::ImageRequest($this->consumer_key,
+								  $this->consumer_secret,
+								  $this->oauth_token,
+								  $this->oauth_token_secret,
+								  $image);
+	}
+
+	// Dictionaryオブジェクトの Save メソッドにアクセスするためのメソッド
+	function Save() {
+		$this->dic->Save();
+	}
 	
 }

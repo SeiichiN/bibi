@@ -23,4 +23,11 @@ function putMsgLog($msg) {
 	return error_log($msg, 3, $log);
 }
 	
+function putErrLog($msg) {
+	$logtime = date('Y-m-d_His');
+	$log = 'log/error_' . $logtime . '.log';
+	$msg = 'エラー:' . $msg . "\n";
+	return error_log($msg, 3, $log);
+}
+	
 
