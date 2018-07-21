@@ -1,22 +1,42 @@
 <?php
 
-//形態素解析チェック
 
-//morphemeクラスの読み込み
-require_once("morpheme.php");
+//応答チェック
 
-require_once("util.php");
+//初期設定ファイルの読み込み
+require_once("ini.php");
 
 
-$text = "今日は天気が良いです";
+//Botクラスの読み込み
+require_once("bot_core.php");
 
-$m = new Yahoo_morph();
-$xml = $m->Request($text);
 
-//XML展開
-foreach ($xml as $k => $v) {
-	$txt = $v->surface." ".$v->reading." ".$v->pos;
-	Util::debug_print($txt);
+//Botオブジェクトの生成
+$myBot = new Bot($user, $consumer_key, $consumer_secret, $access_token, $access_token_secret);
+
+
+
+set_time_limit(0);
+($stdin = fopen("php://stdin", "r")) || die("Cannot open stdin.");
+
+while (1) {
+
+	print(">");
+ 	$input = trim(fgets($stdin, 256));
+
+	if($input == "exit") {
+		$myBot->Save();	//辞書を保存
+		break;
+	}
+
+	$text = mb_convert_encoding($input, "UTF-8", "auto");
+
+	//送信する文字列の取得
+	$txt = $myBot->Conversation($text);
+
+	$txt = "Bot(".$myBot->ResponderName()."-機嫌値[".$myBot->emotion->mood."])>".$txt;
+	Util::Debug_print($txt);
+
 }
 
 

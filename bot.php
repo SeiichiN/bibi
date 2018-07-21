@@ -81,6 +81,7 @@ foreach ($mentions as $Timeline) {
 		continue;
 	}
 
+
 	// Webからの投稿以外なら返信カウンタをチェックする
 	// つまり、ボットとかそういうのを対象にする
 	if (!stristr($source, 'web')) {
@@ -216,7 +217,7 @@ $txt = "こんにちは";
 
 // 送信する文字列を取得する
 // Speaksは、timeかrandomのどちらかである。
-$mytxt = $myBot->Speaks($txt);
+// $mytxt = $myBot->Speaks($txt);
 
 // エラーレベルを変更
 $level_org = error_reporting();
