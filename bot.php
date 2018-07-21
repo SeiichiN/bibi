@@ -188,10 +188,10 @@ foreach ($mentions as $Timeline) {
 if (DEBUG_MODE) echo "================== タイムラインの出力終了 ===================== \n";
 
 
-if (DEBUG_MODE) echo ">>>>> プロファイル画像を更新するよ <<<<< \n";
-
 // プロフィール画像を更新する
-$myBot->ProfileImage();
+$no = $myBot->ProfileImage();
+
+if (DEBUG_MODE) { echo ">>>>> プロファイル画像を bot_{$no}.png に変更したよ。<<<<< \n"; }
 
 // 最後に取得した発言のIDをファイルに記録する
 /* $option = array();
@@ -217,7 +217,7 @@ $txt = "こんにちは";
 
 // 送信する文字列を取得する
 // Speaksは、timeかrandomのどちらかである。
-// $mytxt = $myBot->Speaks($txt);
+$mytxt = $myBot->Speaks($txt);
 
 // エラーレベルを変更
 $level_org = error_reporting();

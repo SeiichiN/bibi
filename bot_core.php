@@ -305,6 +305,7 @@ class Bot {
 								  $this->oauth_token,
 								  $this->oauth_token_secret,
 								  $image);
+		return $no;
 	}
 
 	// Dictionaryオブジェクトの Save メソッドにアクセスするためのメソッド
