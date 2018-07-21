@@ -140,7 +140,8 @@ foreach ($mentions as $Timeline) {
 		if (MOOD_MODE) { $myBot->emotion->User_mood($uid); }
 		
 		// 送信する文字列を取得する（現在、パターンによる返事）
-		$txt = $myBot->Conversation($text, $user);
+		$txt = $myBot->Conversation($text, $uid);  // <-- p122  $user となっているけど、こっちでは？
+		
 
 		// コマンドプロンプトでの出力確認用
 		if (DEBUG_MODE) {
@@ -165,8 +166,6 @@ foreach ($mentions as $Timeline) {
 			$reply_cnt++;
 			if (DEBUG_MODE) {
 				echo '返信カウンタ=> ', $reply_cnt, "\n";
-				// echo '$sid=> ', $sid, "\n";
-				// echo '$uid=> ', $uid, "\n";
 			}
 
 			$option = array();
@@ -203,7 +202,7 @@ if (!empty($sid)) {
     array_push($option, $sid, $screen_name, $text);
     $myBot->WriteData("Since", $option);
     
-    if (DEBUG_MODE) { echo "最後に取得した発言ID \n $sid \n $screen_name \n $text \n"; }
+    if (DEBUG_MODE) { echo "--- 最後に取得した発言ID \n --- $sid \n --- $screen_name \n --- $text \n"; }
 } else {
     if (DEBUG_MODE) { echo "新しく取得した発言はありませんでした。\n"; }
 }
@@ -409,7 +408,7 @@ if (!empty($sid)) {
     array_push($option, $sid, $screen_name, $text);
     $myBot->WriteData("Mentions", $option);
     
-    if (DEBUG_MODE) { echo "最後に取得したリプライのID \n $sid \n $screen_name \n $text \n"; }
+    if (DEBUG_MODE) { echo "--- 最後に取得したリプライのID \n --- $sid \n --- $screen_name \n --- $text \n"; }
 } else {
     if (DEBUG_MODE) { echo "リプライはありませんでした。\n"; }
 }

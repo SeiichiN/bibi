@@ -1,9 +1,13 @@
 <?php // dictionary.php
+
 // 辞書クラス
 
 // 定数の定義
 // パターン辞書のファイル名
 define("PATTERN_DIC", "./dic/PatternDic2.txt");
+// ランダム辞書のファイル名
+define("RANDOM_DIC", "./dic/RandomDic1.txt");
+// セパレータ
 define("SEPARATOR", "/^((-?\d+)##)?(.*)$/");
 
 /* 
@@ -29,10 +33,16 @@ class Dictionary {
     // メンバ変数
     // ファイルから読み込んだテキストを格納する変数
     var $pattern = array();
+	
+	// ランダム辞書から読み込んだテキストを格納する変数
+	var $random = array();
 
     // コンストラクタ
     function __construct() {
+		// パターン辞書を読み込む
         $this->PatternLoad();
+		// ランダム辞書を読み込む
+		$this->RandomLoad();
     }
 
     // パターン辞書ファイルを読み込むメソッド
@@ -40,7 +50,7 @@ class Dictionary {
         // パターン辞書ファイルを読み込む
         $dic = PATTERN_DIC;
         if (!file_exists($dic)) {
-            $msg = "$dic ファイルが開けません";
+            $msg = "$dic ファイルが開けません\n";
             putErrLog($msg);
             die($msg);
         }
@@ -65,6 +75,58 @@ class Dictionary {
     // パターン辞書にアクセスするためのメソッド
     function Pattern() {
         return $this->pattern;
+    }
+
+	// ランダム辞書ファイルを読み込むメソッド
+	function RandomLoad() {
+		$dic = RANDOM_DIC;
+		if (!file_exists($dic)) {
+			$msg = "$dic ファイルが開けません\n";
+            putErrLog($msg);
+            die($msg);
+        }
+        $file = file($dic);
+        // ランダム辞書を連想配列に格納する
+        foreach ($file as $line) {
+            $l = rtrim($line, "\n");
+            if (empty($l)) { continue; }
+            array_push($this->random, $l);
+        }
+    }
+
+    // 辞書の学習メソッドを実行
+    function Study($text) {
+        $this->Study_Random($text);
+    }
+
+    // ランダム辞書の学習メソッド
+    function Study_Random($text) {
+        // 引数のテキストと同じ内容が辞書内にあるかどうかをチェック
+        if (array_search($text, $this->random) !== FALSE) { return; }
+        // なかったらランダム辞書のハッシュに登録する
+        array_push($this->random, $text);
+    }
+
+    // ランダム辞書のハッシュをファイルに保存する
+    function Save() {
+        $dat = RANDOM_DIC;
+		if (!file_exists($dat)) {
+			$msg = "$dat ファイルが開けません\n";
+            putErrLog($msg);
+            die($msg);
+        }
+        $fdat = fopen($dat, 'w');
+        flock($fdat, LOCK_EX);
+        foreach($this->random as $line) {
+            fputs($fdat, $line . "\n");
+        }
+        flock($fdat, LOCK_UN);
+        fclose($fdat);
+    }
+
+    // ランダム辞書にアクセスするためのメドッド
+    function Random() {
+        return $this->random;
     }
 }
 

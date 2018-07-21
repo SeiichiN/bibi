@@ -9,6 +9,9 @@ require_once("ini.php");
 //Botクラスの読み込み
 require_once("bot_core.php");
 
+// mylib.php
+require_once("mylib.php");
+
 
 //Botオブジェクトの生成
 $myBot = new Bot($user, $consumer_key, $consumer_secret, $access_token, $access_token_secret);

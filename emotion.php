@@ -32,7 +32,10 @@ class Emotion {
      * パターン辞書のパターンと照合し、もしマッチしたら、
      * 機嫌値($this->mood)を変動させて、保存する。
 	 */
-	function Update($input) {
+	function Update($input, $uid) {
+
+		$this->uid = $uid;
+
 		// パターン辞書の要素を繰り返し処理する
 		foreach ($this->dictionary->Pattern() as $ptn_item) {
 			// パターンマッチをおこなう

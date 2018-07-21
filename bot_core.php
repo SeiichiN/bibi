@@ -12,15 +12,12 @@ require_once("responder.php");
 // Dictionaryクラスの読み込み
 require_once("dictionary.php");
 
+// Emotionクラスの読み込み
+require_once("emotion.php");
+
 // Oauthライブラリの読み込み
 require_once("./oauth/autoload.php");
 use Abraham\TwitterOAuth\TwitterOAuth;
-
-// Dictionaryクラスの読み込み
-require_once("dictionary.php");
-
-// Emotionクラスの読み込み
-require_once("emotion.php");
 
 /* Botクラスの定義 */
 class Bot {
@@ -140,7 +137,7 @@ class Bot {
 	}
 
 	/* テキストをResponderオブジェクトに渡すメソッド（リプライ用） */
-	function Conversation($input)
+	function Conversation($input, $uid)
 	{
 		// GreetingResponderをResponder に設定する
 		// $this->responder = $this->greet_responder;
@@ -148,8 +145,16 @@ class Bot {
 		// PatternResponderをResponder に設定する
 		$this->responder = $this->pattern_responder;
 
+		// 宛先のユーザー名を消す
+		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));
+
 		// パターンマッチをおこない、感情を変動させる
-		$this->emotion->Update($input);
+		$this->emotion->Update($input, $uid);
+
+		// Studyメソッドにテキストを渡して学習する
+		$this->dic->Study($input);
+
+		$this->save();  // 辞書ファイルの保存
 		
 		// Responseを返す
 		// $this->responder = $this->what_responder;
@@ -293,6 +298,11 @@ class Bot {
 								  $this->oauth_token,
 								  $this->oauth_token_secret,
 								  $image);
+	}
+
+	// Dictionaryオブジェクトの Save メソッドにアクセスするためのメソッド
+	function Save() {
+		$this->dic->Save();
 	}
 	
 }
