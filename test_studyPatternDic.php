@@ -1,10 +1,11 @@
 <?php
-// 文章をテンプレートとして覚える
+
 
 //応答チェック
 
 //初期設定ファイルの読み込み
 require_once("ini.php");
+
 
 //Botクラスの読み込み
 require_once("bot_core.php");
