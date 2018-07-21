@@ -212,11 +212,11 @@ if (!empty($sid)) {
 $myBot->DeleteFile("Count", 1800);
 
 // 送信する文字列を設定する
-// $txt = "こんにちは";
+$txt = "こんにちは";
 
 // 送信する文字列を取得する
 // Speaksは、timeかrandomのどちらかである。
-// $text = $myBot->Speaks($txt);
+$mytxt = $myBot->Speaks($txt);
 
 // エラーレベルを変更
 $level_org = error_reporting();
@@ -232,10 +232,10 @@ if (DEBUG_MODE) {
 error_reporting($level_org);
 
 // ツイートを送信する
-// if($text){
-// 	$myBot->Post($text);
-// 	putMsgLog($text);        // ツイートをログに残す
-// }
+if($mytxt){
+ 	$myBot->Post($mytxt);
+ 	putMsgLog($mytxt);        // ツイートをログに残す
+}
 
 /*
  * ===========================================================

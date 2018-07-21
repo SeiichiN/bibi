@@ -36,7 +36,7 @@ class Responder {
 class TimeResponder extends Responder {
 
 	// 現在時によって送信する言葉をセットするメソッド
-	function Response($text, $mood) {
+	function Response($text, $mood = NULL) {
 		$hour = date("G");
 		
 		switch ($hour) {
@@ -65,7 +65,7 @@ class TimeResponder extends Responder {
 class RandomResponder extends Responder {
 
 	// メンバ変数
-	var $text;  // テキストを格納する変数
+	var $text = array();  // テキストを格納する変数（配列）
 
 	// コンストラクタ（初期化用メソッド）
 	function __construct($name) {
@@ -83,17 +83,19 @@ class RandomResponder extends Responder {
 		
 		// 辞書ファイルの存在チェック
 		if (!file_exists($dic)) {
-			die("辞書ファイルが開けません。");
+			$msg = "辞書ファイルが開けません。";
+			putErrLog($msg);
+			die($msg);
 		}
 
-		// 辞書ファイルを変数に格納する
+		// 辞書ファイルの内容を1行ずつを配列に格納する
 		$this->text = file($dic);
 		
 	}
 
 	
 	// 読み込んだ辞書ファイルからランダムに文字列を取り出すメソッド
-	function Response($text, $mood) {
+	function Response($text, $mood = NULL) {
 		$res = $this->text[rand(0, count($this->text) - 1)];
 		// 改行コードを取り除く
 		return rtrim($res, "\n");
@@ -104,7 +106,7 @@ class RandomResponder extends Responder {
 class WhatResponder extends Responder {
 
 	// 受け取った文字列に「って何？」をつけて返すメソッド
-	function Response($text, $mood) {
+	function Response($text, $mood = NULL) {
 		return $text . 'って何？';
 	}
 }
@@ -113,7 +115,7 @@ class WhatResponder extends Responder {
 class GreetingResponder extends Responder {
 
 	// 発言に挨拶文が含まれていたら、対応する挨拶を返すメソッド
-	function Responder($text, $mood) {
+	function Responder($text, $mood = NULL) {
 		if (preg_match("/おは(よ)?(う|ー|～)/", $text)) {
 			$txt = "おはようございます";}
 		if (preg_match("/こんにち(は|わ)/", $text)) {

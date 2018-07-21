@@ -291,8 +291,6 @@ class Bot {
 		$no = round(($this->emotion->mood + 15) / 6);
 		$image = "./img/bot_" . $no . ".png";
 
-//		$req = Util::ImageRequest($image);
-
 		$req = Util::ImageRequest($this->consumer_key,
 								  $this->consumer_secret,
 								  $this->oauth_token,
