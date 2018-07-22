@@ -7,6 +7,8 @@
 define("PATTERN_DIC", "./dic/PatternDic2.txt");
 // ランダム辞書のファイル名
 define("RANDOM_DIC", "./dic/RandomDic1.txt");
+// テンプレート辞書のファイル名
+define("TEMPLATE_DIC", "./dic/TemplateDic1.txt");
 // セパレータ
 define("SEPARATOR", "/^((-?\d+)##)?(.*)$/");
 
@@ -37,12 +39,17 @@ class Dictionary {
 	// ランダム辞書から読み込んだテキストを格納する変数
 	var $random = array();
 
+	// テンプレート辞書から読み込んだテキストを格納する変数
+	var $template = array();
+
     // コンストラクタ
     function __construct() {
 		// パターン辞書を読み込む
         $this->PatternLoad();
 		// ランダム辞書を読み込む
 		$this->RandomLoad();
+		// テンプレート辞書を読み込む
+		$this->TemplateLoad();
     }
 
     // パターン辞書ファイルを読み込むメソッド
@@ -77,7 +84,19 @@ class Dictionary {
         return $this->pattern;
     }
 
-	// パターン辞書の学習メソッド
+	/**
+     * Study_Pattern -- パターン辞書の学習メソッド
+     * @param:
+     *   string $text -- 発言文（1行）
+     *   object $words -- 形態素解析で取得したオブジェクト
+     *      $this->xml->ma_result_word_list->word 
+     *     [0]=> { ["surface"]=> "今日", ["reading"]=> "きょう", ["pos"]=> "名詞" }
+     *     [1]=> { ["surface"]=> "は"  , ["reading"]=> "は"    , ["pos"]=> "助詞" }
+     *     [2]=> { ["surface"]=> "天気", ["reading"]=> "てんき", ["pos"]=> "名詞"  }
+     *     [3]=> { ["surface"]=> "が"  , ["reading"]=> "が"    , ["pos"]=> "助詞"  }
+     *     [4]=> { ["surface"]=> "良い", ["reading"]=> "よい"  , ["pos"]=> "形容詞" }
+     *     [5]=> { ["surface"]=> "です", ["reading"]=> "です"  , ["pos"]=> "助動詞" }
+     */
 	function Study_Pattern($text, $words) {
 		foreach ($words as $k => $v) {
 			//名刺でなかったら処理しない
@@ -125,13 +144,20 @@ class Dictionary {
         }
     }
 
-    // 辞書の学習メソッドを実行
+    /**
+     * Study -- 辞書の学習メソッドを実行
+     * @param: string $text -- 1行の発言文
+     *         
+     */
     function Study($text, $words) {
 		// ランダム辞書に、発言($text)を追加する
         $this->Study_Random($text);
 
 		// パターン辞書に形態素解析の結果を追加する
 		$this->Study_Pattern($text, $words);
+
+		// テンプレート辞書学習メソッド
+		$this->Study_template($words);
     }
 
     // ランダム辞書の学習メソッド
@@ -142,10 +168,78 @@ class Dictionary {
         array_push($this->random, $text);
     }
 
+	// テンプレート辞書を読み込むメソッド
+	function TemplateLoad() {
+		$dic = TEMPLATE_DIC;
+		if (!file_exists($dic)) {
+			$msg = "$dic ファイルが開けません。";
+			putErrLog($msg);
+			die($msg);
+		}
+		$file = file($dic);
+		foreach ($file as $line) {
+			// タブで分割されたテキストのそれぞれを $key, $val に代入する
+			list($key, $val) = explode("\t", rtrim($line, "\n"));
+			// 連想配列に要素を格納する
+			if (!$this->template[$key]) { $this->template[$key] = array(); }
+			array_push($this->template[$key], $val);
+		}
+	}
+
+	/**
+     * Study_Template -- テンプレート辞書の学習メソッド
+     * @param:
+     *   object $words -- 形態素解析で取得したオブジェクト
+     *      $this->xml->ma_result_word_list->word 
+     *     [0]=> { ["surface"]=> "今日", ["reading"]=> "きょう", ["pos"]=> "名詞" }
+     *     [1]=> { ["surface"]=> "は"  , ["reading"]=> "は"    , ["pos"]=> "助詞" }
+     *     [2]=> { ["surface"]=> "天気", ["reading"]=> "てんき", ["pos"]=> "名詞"  }
+     *     [3]=> { ["surface"]=> "が"  , ["reading"]=> "が"    , ["pos"]=> "助詞"  }
+     *     [4]=> { ["surface"]=> "良い", ["reading"]=> "よい"  , ["pos"]=> "形容詞" }
+     *     [5]=> { ["surface"]=> "です", ["reading"]=> "です"  , ["pos"]=> "助動詞" }
+	 *
+	 * できあがりのテンプレート（例）
+	 *   $this->template[1] -- [ '%noun%がほしいね', '%noun%が笑った', ... ]
+	 *   $this->template[2] -- [ '%noun%は%noun%が良いです', '%noun%は%noun%だ', ... ]
+	 *   $this->template[3] -- [ '%noun%と%noun%は%noun%です', '%noun%は%noun%が好きで、%noun%が嫌いだ', ... ]
+	 *   ....
+     */
+	function Study_Template($words) {
+		$template = "";
+		$count = 0;
+		foreach ($words as $k => $v) {
+			$surface = $v->surface;
+			// 単語が名詞だったら
+			if (preg_match("/名詞/", $v->pos)) {
+				// 単語を %noun% に置き換える
+				$surface = "%noun%";
+				$count += 1;  // 空欄の数をカウントする
+			}
+			// 単語を連結する
+			$template = $template . $surface;
+		}
+		// $template -- %noun%は%noun%が良いです
+		// $count -- 2
+
+		// 空欄が1つもないなら登録しない
+		if ($count == 0) { return; }
+		if (!$this->template[$count]) { $this->template[$count] = array(); }
+		// テンプレートの重複チェック
+		if (array_search($template, $this->template[$count]) !== FALSE) { return; }
+		// 重複がなかったら追加する
+		array_push($this->template[$count], $template);
+	}
+
+	// テンプレート辞書にアクセスするためのメソッド
+	function Template() {
+		return $this->template;
+	}
+	
+
     // 辞書のハッシュをファイルに保存する
     function Save() {
 		
-		// ランダム辞書の保存
+		// --- ランダム辞書の保存 --------------------------
         $dat = RANDOM_DIC;
 		if (!file_exists($dat)) {
 			$msg = "$dat ファイルが開けません\n";
@@ -160,7 +254,7 @@ class Dictionary {
         flock($fdat, LOCK_UN);
         fclose($fdat);
 
-		// パターン辞書の保存
+		// --- パターン辞書の保存 --------------------------
 		$dat = PATTERN_DIC;
 		if (!file_exists($dat)) {
 			$msg = "$dat ファイルが開けません";
@@ -176,6 +270,25 @@ class Dictionary {
         flock($fdat, LOCK_UN);
         fclose($fdat);
 
+		// --- テンプレート辞書の保存 -------------------------
+		$dat = TEMPLATE_DIC;
+		if (!file_exists($dat)) {
+			$msg = "$dat ファイルが開けません";
+			putErrLog($msg);
+			die($msg);
+		}
+        $fdat = fopen($dat, 'w');
+        flock($fdat, LOCK_EX);
+		// テンプレート辞書のハッシュを展開する
+        foreach($this->template as $key1 => $val1) {
+			foreach ($val1 as $key2 => $val2) {
+				// テンプレート辞書のフォーマットにしたがって、1行ずつ保存する
+				fputs($fdat, $key1 . "\t" . $val2 . "\n");
+			}
+        }
+        flock($fdat, LOCK_UN);
+        fclose($fdat);
+		
     }
 
     // ランダム辞書にアクセスするためのメドッド

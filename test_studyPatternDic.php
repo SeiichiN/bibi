@@ -1,15 +1,14 @@
 <?php
-// 発言を形態素解析してテンプレート辞書を作成する
+
 
 //応答チェック
 
 //初期設定ファイルの読み込み
 require_once("ini.php");
 
+
 //Botクラスの読み込み
 require_once("bot_core.php");
-
-require_once("mylib.php");
 
 
 //Botオブジェクトの生成

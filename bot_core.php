@@ -43,6 +43,8 @@ class Bot {
 	var $greet_responder;
 	// PatternResponderオブジェクトを格納する変数
 	var $pattern_responder;
+	// TemplateResponderオブジェクトを格納する変数
+	var $template_responder;
 	// Emotionオブジェクトを格納する変数
 	var $emotion;
 
@@ -84,6 +86,9 @@ class Bot {
 		
 		// RandomResponderオブジェクトの生成
 		$this->rand_responder = new RandomResponder('Random', $this->dic);
+
+		// TemplateResponderオブジェクトの生成
+		$this->template_responder = new TemplateResponder('Template', $this->dic);
 		
 		// RandomResponderを規定のResponderにする
 		$this->responder = $this->rand_responder;
@@ -146,7 +151,10 @@ class Bot {
 		// $this->responder = $this->greet_responder;
 		
 		// PatternResponderをResponder に設定する
-		$this->responder = $this->pattern_responder;
+		// $this->responder = $this->pattern_responder;
+
+		// TemplateResponderをResponder に設定する
+		$this->responder = $this->template_responder;
 
 		// 宛先のユーザー名を消す
 		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));
@@ -164,10 +172,16 @@ class Bot {
 
 		$this->save();  // 辞書ファイルの保存
 		
-		// Responseを返す
-		// $this->responder = $this->what_responder;
-		// $this->emotion->mood -- 現在の機嫌値
-		$res = $this->responder->Response($input, $this->emotion->mood);
+		/**
+		 * Responseを返す
+		 * @param: string $input -- 発言
+		 *                $this->emotion->mood -- 現在の機嫌値
+		 *         object $words -- 形態素解析結果
+		 */
+		$res = $this->responder->Response($input, $this->emotion->mood, $words);
+		
+		// if (DEBUG_MODE) { echo '>>> $res=> ', $res, "\n"; }
+		
 		return $res;
 	}
 

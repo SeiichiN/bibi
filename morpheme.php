@@ -1,4 +1,8 @@
 <?php // morpheme.php
+/*
+ * 参考サイト
+ * https://developer.yahoo.co.jp/webapi/jlp/ma/v1/parse.html
+ */
 
 // Yahoo API のアプリケーションID
 define("YAHOO_API_ID", "dj00aiZpPVlXc3prb0lvOGtGTSZzPWNvbnN1bWVyc2VjcmV0Jng9YWE-");
