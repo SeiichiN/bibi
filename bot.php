@@ -12,6 +12,8 @@ require_once("mylib.php");
 // Botクラスの読み込み
 require_once("bot_core.php");
 
+$specialUsers = 'kuon5505 / saigonohito';
+
 // Botオブジェクトの生成
 $myBot = new Bot($user, $consumer_key, $consumer_secret,
 				 $access_token, $access_token_secret);
@@ -44,8 +46,10 @@ foreach ($mentions as $Timeline) {
 
 	if (DEBUG_MODE) echo "----------------------------------------------------------\n";
 
-	$txt = null;
+	$txt = null;  // こちらが発言する内容を格納する変数
 
+	$specialUser = 'no';
+	
 	// 発言のIDの取得（文字列で取得）
 	$sid = $Timeline->id_str;
 	// if(DEBUG_MODE){	echo '$sid（発言ID）=> ', $sid, "\n"; }
@@ -55,6 +59,11 @@ foreach ($mentions as $Timeline) {
     if (DEBUG_MODE) {
         echo "$screen_name > 「 $Timeline->text 」 \n";
     }
+
+	// このユーザーの発言には、レスポンスをつける。（辞書で学習する）
+	if (preg_match("/{$screen_name}/", $specialUsers)) {
+		$specialUser = 'yes';
+	}
     
 	// 送信元の取得
 	$source = $Timeline->source;
@@ -128,11 +137,11 @@ foreach ($mentions as $Timeline) {
 	}
 
     
-	// 相互フォローしているユーザーの発言、またはボット宛のリプライなら
-	if (stristr($text, "@".$user) || strstr($text, "@")) {
+	// 相互フォローしているユーザーの発言、またはボット宛のリプライなら、特別ユーザーなら
+	if (stristr($text, "@".$user) || strstr($text, "@") || $specialUser === 'yes') {
 
 	    if (DEBUG_MODE) {
-			echo "---------------- 相互フォローの発言 あるいは、ボット宛 ------------------ \n";
+			echo "---------------- 相互フォローの発言 あるいは、ボット宛、特別ユーザー  ------------------ \n";
 
 			echo '>>> スクリーン名=> ', $screen_name,  ' $text=> ', $text, "\n";
 		}

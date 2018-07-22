@@ -197,6 +197,12 @@ class Dictionary {
      *     [3]=> { ["surface"]=> "が"  , ["reading"]=> "が"    , ["pos"]=> "助詞"  }
      *     [4]=> { ["surface"]=> "良い", ["reading"]=> "よい"  , ["pos"]=> "形容詞" }
      *     [5]=> { ["surface"]=> "です", ["reading"]=> "です"  , ["pos"]=> "助動詞" }
+	 *
+	 * できあがりのテンプレート（例）
+	 *   $this->template[1] -- [ '%noun%がほしいね', '%noun%が笑った', ... ]
+	 *   $this->template[2] -- [ '%noun%は%noun%が良いです', '%noun%は%noun%だ', ... ]
+	 *   $this->template[3] -- [ '%noun%と%noun%は%noun%です', '%noun%は%noun%が好きで、%noun%が嫌いだ', ... ]
+	 *   ....
      */
 	function Study_Template($words) {
 		$template = "";
@@ -212,6 +218,9 @@ class Dictionary {
 			// 単語を連結する
 			$template = $template . $surface;
 		}
+		// $template -- %noun%は%noun%が良いです
+		// $count -- 2
+
 		// 空欄が1つもないなら登録しない
 		if ($count == 0) { return; }
 		if (!$this->template[$count]) { $this->template[$count] = array(); }
@@ -220,13 +229,17 @@ class Dictionary {
 		// 重複がなかったら追加する
 		array_push($this->template[$count], $template);
 	}
-			 
+
+	// テンプレート辞書にアクセスするためのメソッド
+	function Template() {
+		return $this->template;
+	}
 	
 
     // 辞書のハッシュをファイルに保存する
     function Save() {
 		
-		// ランダム辞書の保存
+		// --- ランダム辞書の保存 --------------------------
         $dat = RANDOM_DIC;
 		if (!file_exists($dat)) {
 			$msg = "$dat ファイルが開けません\n";
@@ -241,7 +254,7 @@ class Dictionary {
         flock($fdat, LOCK_UN);
         fclose($fdat);
 
-		// パターン辞書の保存
+		// --- パターン辞書の保存 --------------------------
 		$dat = PATTERN_DIC;
 		if (!file_exists($dat)) {
 			$msg = "$dat ファイルが開けません";
@@ -257,6 +270,25 @@ class Dictionary {
         flock($fdat, LOCK_UN);
         fclose($fdat);
 
+		// --- テンプレート辞書の保存 -------------------------
+		$dat = TEMPLATE_DIC;
+		if (!file_exists($dat)) {
+			$msg = "$dat ファイルが開けません";
+			putErrLog($msg);
+			die($msg);
+		}
+        $fdat = fopen($dat, 'w');
+        flock($fdat, LOCK_EX);
+		// テンプレート辞書のハッシュを展開する
+        foreach($this->template as $key1 => $val1) {
+			foreach ($val1 as $key2 => $val2) {
+				// テンプレート辞書のフォーマットにしたがって、1行ずつ保存する
+				fputs($fdat, $key1 . "\t" . $val2 . "\n");
+			}
+        }
+        flock($fdat, LOCK_UN);
+        fclose($fdat);
+		
     }
 
     // ランダム辞書にアクセスするためのメドッド

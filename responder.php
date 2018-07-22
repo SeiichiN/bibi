@@ -15,14 +15,21 @@ class Responder {
 		$this->dictionary = $dictionary;
 	}
 
-	/* 受け取った文字列をそのまま返すメソッド
-	   PHP5.4以上では、メソッドのオーバーライドにおいて
-	   引数が一致しないとエラーが出る。
-	   TimeResponder の Responseメソッドである。
-	   こちらのメソッドの名前を変えておいた
-	   by Seiichi Nukayama 2017.02.11 */
+	/**
+     * Response -- 受け取った文字列をそのまま返すメソッド
+     * 
+     * @param: string $text -- 発言
+     *                $mood -- 数値 (-15 .. 15)
+     *                $words -- 形態素解析の結果（オブジェクト）
+     *
+	 *  PHP5.4以上では、メソッドのオーバーライドにおいて
+	 *  引数が一致しないとエラーが出る。
+	 *  TimeResponder の Responseメソッドである。
+	 *  こちらのメソッドの名前を変えておいた
+	 *    by Seiichi Nukayama 2017.02.11
+     */
 //	function MirrorResponse($text) {
-	function Response($text, $mood) {
+	function Response($text, $mood, $words) {
 		return $text;
 	}
 
@@ -36,7 +43,7 @@ class Responder {
 class TimeResponder extends Responder {
 
 	// 現在時によって送信する言葉をセットするメソッド
-	function Response($text, $mood = NULL) {
+	function Response($text, $mood = NULL, $words = NULL) {
 		$hour = date("G");
 		
 		switch ($hour) {
@@ -95,7 +102,7 @@ class RandomResponder extends Responder {
 
 	
 	// 読み込んだ辞書ファイルからランダムに文字列を取り出すメソッド
-	function Response($text, $mood = NULL) {
+	function Response($text, $mood = NULL, $words = NULL) {
 		$res = $this->text[rand(0, count($this->text) - 1)];
 		// 改行コードを取り除く
 		return rtrim($res, "\n");
@@ -106,7 +113,7 @@ class RandomResponder extends Responder {
 class WhatResponder extends Responder {
 
 	// 受け取った文字列に「って何？」をつけて返すメソッド
-	function Response($text, $mood = NULL) {
+	function Response($text, $mood = NULL, $words = NULL) {
 		return $text . 'って何？';
 	}
 }
@@ -115,7 +122,7 @@ class WhatResponder extends Responder {
 class GreetingResponder extends Responder {
 
 	// 発言に挨拶文が含まれていたら、対応する挨拶を返すメソッド
-	function Responder($text, $mood = NULL) {
+	function Responder($text, $mood = NULL, $words = NULL) {
 		if (preg_match("/おは(よ)?(う|ー|～)/", $text)) {
 			$txt = "おはようございます";}
 		if (preg_match("/こんにち(は|わ)/", $text)) {
@@ -142,7 +149,7 @@ class GreetingResponder extends Responder {
 class PatternResponder extends Responder {
 
 	// パターン辞書をもとに応答メッセージを作るメソッド
-	function Response($text, $mood) {
+	function Response($text, $mood, $words = NULL) {
 		// パターン辞書の先頭行から順にパターンマッチをおこなう
 		foreach($this->dictionary->Pattern() as $ptn_item) {
 			if ($ptn = $ptn_item->Match($text)) {
@@ -153,5 +160,48 @@ class PatternResponder extends Responder {
 			}
 		}
 	}
+}
+
+/* TemplateResponderクラスの定義（Responderクラスを継承） */
+class TemplateResponder extends Responder {
+
+    // テンプレート辞書を元に応答メッセージを作るメソッド
+    // 引数$words に形態素解析の結果を渡す
+    /**
+     * @param: object $words
+     *      $this->xml->ma_result_word_list->word
+     *     （例） 
+     *     [0]=> { ["surface"]=> "今日", ["reading"]=> "きょう", ["pos"]=> "名詞" }
+     *     [1]=> { ["surface"]=> "は"  , ["reading"]=> "は"    , ["pos"]=> "助詞" }
+     *     [2]=> { ["surface"]=> "天気", ["reading"]=> "てんき", ["pos"]=> "名詞"  }
+     *     [3]=> { ["surface"]=> "が"  , ["reading"]=> "が"    , ["pos"]=> "助詞"  }
+     *     [4]=> { ["surface"]=> "良い", ["reading"]=> "よい"  , ["pos"]=> "形容詞" }
+     *     [5]=> { ["surface"]=> "です", ["reading"]=> "です"  , ["pos"]=> "助動詞" }
+     * 
+     * $keywords -- （例）['今日', '天気']
+     */
+    function Response($text, $mood, $words) {
+        // 文章に含まれるキーワード（名詞）を配列に格納する
+        $keywords = array();
+        foreach ($words as $k => $v) {
+            if (preg_match("/名詞/", $v->pos)) {
+                array_push($keywords, $v->surface);
+            }
+        }
+        // キーワードの数を数える -- （例）$count = 2
+        $count = count($keywords);
+        // 辞書に使えるテンプレートがあったら
+        //   （例）$this->template[2] -- [ '%noun%は%noun%が良いです', '%noun%は%noun%だ', ... ]
+        if ($count > 0 && $templates = $this->dictionary->template[$count]) {
+            // キーワード数にマッチするテンプレートを辞書からランダムに選択する
+            $template = $templates[rand(0, count($templates) - 1)];
+            // 「%noun%」をキーワードに置き換える
+            foreach ($keywords as $v) {
+                $templ = preg_replace("/%noun%/", $v, $template, 1);
+                $template = $templ;
+            }
+            return $template;
+        }
+    }
 }
 

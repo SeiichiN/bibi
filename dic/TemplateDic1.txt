@@ -1,0 +1,8 @@
+1	%noun%はまた暑い。
+1	%noun%に行きたくなってきた。
+1	やはり謙虚さが一番%noun%なんかな。
+3	%noun%の%noun%で%noun%を叫ぶ
+3	%noun%の%noun%にも%noun%年
+2	%noun%よ、%noun%を抱け
+2	%noun%、%noun%になるとすごく眠くなる。暑さのせいかな。
+6	%noun%って、同じくらいの%noun%の%noun%%noun%の、約%noun%倍以上の%noun%て感じやな。
