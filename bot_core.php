@@ -45,6 +45,9 @@ class Bot {
 	var $pattern_responder;
 	// TemplateResponderオブジェクトを格納する変数
 	var $template_responder;
+	// MarkovResponderオブジェクトを格納する変数
+	var $markov_responder;
+	
 	// Emotionオブジェクトを格納する変数
 	var $emotion;
 
@@ -89,6 +92,9 @@ class Bot {
 
 		// TemplateResponderオブジェクトの生成
 		$this->template_responder = new TemplateResponder('Template', $this->dic);
+
+		// MarkovResponderオブジェクトの生成
+		$this->markov_responder = new MarkovResponder('Markov', $this->dic);
 		
 		// RandomResponderを規定のResponderにする
 		$this->responder = $this->rand_responder;
@@ -154,7 +160,10 @@ class Bot {
 		// $this->responder = $this->pattern_responder;
 
 		// TemplateResponderをResponder に設定する
-		$this->responder = $this->template_responder;
+		// $this->responder = $this->template_responder;
+
+		// MarkovResponderをResponder に設定する
+		$this->responder = $this->markov_responder;
 
 		// 宛先のユーザー名を消す
 		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));

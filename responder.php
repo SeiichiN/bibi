@@ -205,3 +205,25 @@ class TemplateResponder extends Responder {
     }
 }
 
+/* MarkovResponderクラスの定義（Responderクラスを継承） */
+class MarkovResponder extends Responder {
+
+	function Response($text, $mood, $words) {
+		$keywords = array();
+		// キーワード（名詞）の抽出
+		foreach ($words as $v) {
+			if (preg_match("/名詞/", $v->pos)) {
+				array_push($keywords, $v->surface);
+			}
+		}
+
+		// キーワードから文章を生成して返す
+		if (count($keywords)) {
+			$keyword = $keywords[rand(0, count($keywords) - 1)];
+			// MarkovクラスのGenerateメソッドで文章を生成する
+			$res = $this->dictionary->markov->Generate(chop($keyword));
+			if ($res) { return $res; }
+		}
+	}
+}
+		
