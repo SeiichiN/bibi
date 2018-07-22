@@ -2,6 +2,10 @@
 
 // 辞書クラス
 
+// Markovクラスの読み込み
+require_once("markov.php");
+
+
 // 定数の定義
 // パターン辞書のファイル名
 define("PATTERN_DIC", "./dic/PatternDic2.txt");
@@ -9,6 +13,7 @@ define("PATTERN_DIC", "./dic/PatternDic2.txt");
 define("RANDOM_DIC", "./dic/RandomDic1.txt");
 // テンプレート辞書のファイル名
 define("TEMPLATE_DIC", "./dic/TemplateDic1.txt");
+
 // セパレータ
 define("SEPARATOR", "/^((-?\d+)##)?(.*)$/");
 
@@ -42,6 +47,9 @@ class Dictionary {
 	// テンプレート辞書から読み込んだテキストを格納する変数
 	var $template = array();
 
+	// マルコフオブジェクトを格納する変数
+	var $markov;
+	
     // コンストラクタ
     function __construct() {
 		// パターン辞書を読み込む
@@ -50,6 +58,8 @@ class Dictionary {
 		$this->RandomLoad();
 		// テンプレート辞書を読み込む
 		$this->TemplateLoad();
+		// マルコフ辞書の読み込み
+		$this->MarkovLoad();
     }
 
     // パターン辞書ファイルを読み込むメソッド
@@ -158,7 +168,10 @@ class Dictionary {
 
 		// テンプレート辞書学習メソッド
 		$this->Study_template($words);
-    }
+
+		// マルコフ辞書の学習メソッド
+		$this->Study_Markov($words);
+	}
 
     // ランダム辞書の学習メソッド
     function Study_Random($text) {
@@ -167,6 +180,12 @@ class Dictionary {
         // なかったらランダム辞書のハッシュに登録する
         array_push($this->random, $text);
     }
+
+    // ランダム辞書にアクセスするためのメドッド
+    function Random() {
+        return $this->random;
+    }
+
 
 	// テンプレート辞書を読み込むメソッド
 	function TemplateLoad() {
@@ -234,6 +253,27 @@ class Dictionary {
 	function Template() {
 		return $this->template;
 	}
+
+	// マルコフ辞書ファイルを読み込むメソッド
+	function MarkovLoad() {
+		$this->markov = new Markov();
+		$this->markov->Load();
+	}
+
+	/**
+     * Study_Markov -- マルコフ辞書の学習（作成）メソッドを呼び出す
+     * @param: object $words -- 形態素解析結果
+     *        object $this->xml->ma_result_word_list->word 
+     *   [0]=> { ["surface"]=> "今日", ["reading"]=> "きょう", ["pos"]=> "名詞" }
+     *   [1]=> { ["surface"]=> "は"  , ["reading"]=> "は"    , ["pos"]=> "助詞" }
+     *   [2]=> { ["surface"]=> "天気", ["reading"]=> "てんき", ["pos"]=> "名詞"  }
+     *   [3]=> { ["surface"]=> "が"  , ["reading"]=> "が"    , ["pos"]=> "助詞"  }
+     *   [4]=> { ["surface"]=> "良い", ["reading"]=> "よい"  , ["pos"]=> "形容詞" }
+     *   [5]=> { ["surface"]=> "です", ["reading"]=> "です"  , ["pos"]=> "助動詞" }
+	 */
+	function Study_Markov($words) {
+		$this->markov->Add_Sentence($words);
+	}
 	
 
     // 辞書のハッシュをファイルに保存する
@@ -288,14 +328,11 @@ class Dictionary {
         }
         flock($fdat, LOCK_UN);
         fclose($fdat);
+
+        // --- マルコフ辞書の保存 -------------------------
+        $this->markov->Save();
 		
     }
-
-    // ランダム辞書にアクセスするためのメドッド
-    function Random() {
-        return $this->random;
-    }
-
 	
 }
 

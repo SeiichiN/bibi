@@ -149,7 +149,7 @@ foreach ($mentions as $Timeline) {
 		// 現在の機嫌値をファイルから読み込んでセットする
 		if (MOOD_MODE) { $myBot->emotion->User_mood($uid); }
 		
-		// 送信する文字列を取得する（現在、パターンによる返事）
+		// 送信する文字列を取得する（現在、マルコフ辞書による返事）
 		$txt = $myBot->Conversation($text, $uid);  // <-- p122  $user となっているけど、こっちでは？
 		
 
