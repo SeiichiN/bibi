@@ -13,6 +13,8 @@ define("PATTERN_DIC", "./dic/PatternDic2.txt");
 define("RANDOM_DIC", "./dic/RandomDic1.txt");
 // テンプレート辞書のファイル名
 define("TEMPLATE_DIC", "./dic/TemplateDic1.txt");
+// 禁止語辞書のファイル名
+define("PROHIBIT_DIC", "./dic/ProhibitDic.txt");
 
 // セパレータ
 define("SEPARATOR", "/^((-?\d+)##)?(.*)$/");
@@ -49,6 +51,9 @@ class Dictionary {
 
 	// マルコフオブジェクトを格納する変数
 	var $markov;
+
+	// 禁止語辞書を格納する変数
+	var $prohibit = array();
 	
     // コンストラクタ
     function __construct() {
@@ -60,6 +65,8 @@ class Dictionary {
 		$this->TemplateLoad();
 		// マルコフ辞書の読み込み
 		$this->MarkovLoad();
+		// 禁止語辞書の読み込み
+		$this->ProhibitLoad();
     }
 
     // パターン辞書ファイルを読み込むメソッド
@@ -93,6 +100,35 @@ class Dictionary {
     function Pattern() {
         return $this->pattern;
     }
+
+    /**
+     * Study -- 辞書の学習メソッドを実行
+     * @param: string $text -- 1行の発言文
+     *         
+     */
+    function Study($text, $words) {
+
+		// 禁止語チェック
+		foreach ($this->prohibit as $v) {
+			$ptn = "/".$v."/";
+			// 禁止語が含まれていたら学習しない
+			if (preg_match($ptn,$text)) {
+				return;
+			}
+		}
+			
+		// ランダム辞書に、発言($text)を追加する
+        $this->Study_Random($text);
+
+		// パターン辞書に形態素解析の結果を追加する
+		$this->Study_Pattern($text, $words);
+
+		// テンプレート辞書学習メソッド
+		$this->Study_template($words);
+
+		// マルコフ辞書の学習メソッド
+		$this->Study_Markov($words);
+	}
 
 	/**
      * Study_Pattern -- パターン辞書の学習メソッド
@@ -153,25 +189,6 @@ class Dictionary {
             array_push($this->random, $l);
         }
     }
-
-    /**
-     * Study -- 辞書の学習メソッドを実行
-     * @param: string $text -- 1行の発言文
-     *         
-     */
-    function Study($text, $words) {
-		// ランダム辞書に、発言($text)を追加する
-        $this->Study_Random($text);
-
-		// パターン辞書に形態素解析の結果を追加する
-		$this->Study_Pattern($text, $words);
-
-		// テンプレート辞書学習メソッド
-		$this->Study_template($words);
-
-		// マルコフ辞書の学習メソッド
-		$this->Study_Markov($words);
-	}
 
     // ランダム辞書の学習メソッド
     function Study_Random($text) {
@@ -273,6 +290,23 @@ class Dictionary {
 	 */
 	function Study_Markov($words) {
 		$this->markov->Add_Sentence($words);
+	}
+
+	// 禁止語辞書ファイルを読み込むメソッド
+	function ProhibitLoad() {
+		$dic = PROHIBIT_DIC;
+		if (!file_exists($dic)) {
+			$msg = "$dic が開けません";
+			putErrLog($msg);
+			die($msg);
+		}
+		$file = file($dic);
+		// 禁止語辞書を連想配列に格納する
+		foreach ($file as $line) {
+			$l = rtrim($line, "\n");
+			if (empty($l)) { continue; }
+			array_push($this->prohibit, $l);
+		}
 	}
 	
 
