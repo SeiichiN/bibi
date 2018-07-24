@@ -275,6 +275,11 @@ class HoroscopeResponder extends Responder {
         // リクエストパラメータの設定
         $sign = array_search($text, $this->constellation);
 
-        $url = 'http://fortune.jp.msn.com/rss.ospx';
+        $url = 'http://fortune.jp.msn.com/rss.aspx';
 
+		/*
+           MSN 占い - 12星座ランキング
+		   MSN 占い - 12星座ランキング
+		   http://fortune.jp.msn.com/rss.aspx?rsstype=12rank
+         */
 		
