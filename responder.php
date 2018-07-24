@@ -240,3 +240,41 @@ class MarkovResponder extends Responder {
 	}
 }
 		
+/* HoroscopeResponderクラスの定義（Responderクラスを継承） */
+class HoroscopeResponder extends Responder {
+
+	var $constellation;
+
+	function __construct($name) {
+		$this->name = $name;
+		$this->constellation = array(
+			"aries" => "牡羊座",
+			"taurus" => "牡牛座",
+			"gemini" => "双子座",
+			"cancer" => "蟹座",
+			"leo" => "獅子座",
+			"virgo" => "乙女座",
+			"libro" => "天秤座",
+			"scorpio" => "蠍座",
+			"sagittarius" => "射手座",
+			"capricorn" => "山羊座",
+			"aquarius" => "水瓶座",
+			"pisces" => "魚座"
+		);
+	}
+
+    /**
+     * 星占いのRSSを取得して結果を返すメソッド
+     *
+     * @param: string $text -- 発言
+     */
+    function Response($text) {
+
+        $text = str_replace("?", "", $text);
+
+        // リクエストパラメータの設定
+        $sign = array_search($text, $this->constellation);
+
+        $url = 'http://fortune.jp.msn.com/rss.ospx';
+
+		
