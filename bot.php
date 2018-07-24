@@ -149,15 +149,15 @@ foreach ($mentions as $Timeline) {
 		// 現在の機嫌値をファイルから読み込んでセットする
 		if (MOOD_MODE) { $myBot->emotion->User_mood($uid); }
 		
-		// 送信する文字列を取得する（現在、マルコフ辞書による返事）
+		// 送信する文字列を取得する（いろんな辞書をランダムに切り替える）
 		$txt = $myBot->Conversation($text, $uid);  // <-- p122  $user となっているけど、こっちでは？
 		
 
 		// コマンドプロンプトでの出力確認用
 		if (DEBUG_MODE) {
 			if (empty($txt)) echo "レスポンス文=> （空） \n";
-            else echo "レスポンス文=> $txt \n";
-			// Util::Debug_print($txt);
+            else echo "レスポンス文=> ";
+			Util::Debug_print($txt);
 		}
 
 		// $txt が空でなかったら送信する
@@ -165,11 +165,12 @@ foreach ($mentions as $Timeline) {
 			// $txt を発言する（返事）
 			$myBot->Post("@" . $screen_name . " " . $txt, $sid);
 			
-			$logText = "@" . $screen_name . " " . $txt . " > $text \n";
+			$logText = "@{$screen_name}(SpecialUser='{$specialUser}') に対して返信： {$txt}\n";
 			putMsgLog($logText);        // ツイートをログに残す
 
 
-			echo $screen_name, ' に対して返信> 「', $txt,  "」\n";
+			if (DEBUG_MODE) echo "\n", $screen_name, ' に対して返信> 「', $txt,  "」\n\n";
+			
 			// 返信済みユーザーを配列に記憶する
 			$replied_users[] = $screen_name;
 			// 返信カウンタを+1して保存する
@@ -184,14 +185,6 @@ foreach ($mentions as $Timeline) {
 		}
 	}
 	
-    // コマンドプロンプトでの出力確認用
-	/* echo '送信する文字列=>';
-	   if (DEBUG_MODE) {
-	   Util::Debug_print($text);
-	   } else {
-	   echo $text . "<br>\n";
-	   }*/
-
 }
 
 if (DEBUG_MODE) echo "================== タイムラインの出力終了 ===================== \n";
@@ -221,12 +214,14 @@ if (!empty($sid)) {
 // 返信カウンタは30分（1800秒）更新がなければ削除する
 $myBot->DeleteFile("Count", 1800);
 
+// ================================== 必ずおこなう処理 =============================
+
 // 送信する文字列を設定する
-$txt = "こんにちは";
+// $txt = "こんにちは";
 
 // 送信する文字列を取得する
-// Speaksは、timeかrandomのどちらかである。
-$mytxt = $myBot->Speaks($txt);
+// Speaksは、time/randomに設定してある。
+$mytxt = $myBot->Speaks("");
 
 // エラーレベルを変更
 $level_org = error_reporting();
@@ -246,6 +241,9 @@ if($mytxt){
  	$myBot->Post($mytxt);
  	putMsgLog($mytxt);        // ツイートをログに残す
 }
+
+// ================================== 必ずおこなう処理 終了 ========================
+
 
 /*
  * ===========================================================

@@ -1,5 +1,10 @@
 <?php // マルコフ辞書
 
+/*
+  Usage:  $ php test.php anotokino_ojikun.txt
+
+*/
+
 require_once("markov.php");
 require_once("morpheme.php");
 require_once("util.php");
