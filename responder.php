@@ -30,7 +30,7 @@ class Responder {
      */
 //	function MirrorResponse($text) {
 	function Response($text, $mood, $words) {
-		return $text;
+		return "";    // 何も返さないようにする
 	}
 
 	/* 名前を返すメソッド */
@@ -60,8 +60,9 @@ class TimeResponder extends Responder {
 				$text = 'おやすみなさい。';
 				break;
 			default:
-				$today = date("F j, Y, g: i a");
-				$text = $today;
+				// $today = date("F j, Y, g: i a");
+				// $text = $today;
+				$text = "NONE";
 		}
 		return $text;
 	}
@@ -77,9 +78,6 @@ class RandomResponder extends Responder {
 	// コンストラクタ（初期化用メソッド）
 	function __construct($name) {
 		$this->name = $name;
-/*		$this->text = array('がんばる！', '眠い。', 'またあとで',
-							'なんですと！？', 'ぼちぼちね'); 
-*/
 
 		// 乱数の生成
 		$no = rand(1, 3);
@@ -90,7 +88,7 @@ class RandomResponder extends Responder {
 		
 		// 辞書ファイルの存在チェック
 		if (!file_exists($dic)) {
-			$msg = "辞書ファイルが開けません。";
+			$msg = "$dic が開けません。";
 			putErrLog($msg);
 			die($msg);
 		}
@@ -159,6 +157,11 @@ class PatternResponder extends Responder {
 				return preg_replace("/%match%/", $ptn, $res);
 			}
 		}
+
+		// マッチする応答例がなかったら、ランダム辞書から応答例をもってくる
+		if (USE_RANDOM_DIC) {
+			return Util::Select_Random($this->dictionary->random);
+		}
 	}
 }
 
@@ -202,6 +205,11 @@ class TemplateResponder extends Responder {
             }
             return $template;
         }
+
+		// マッチする応答例がなかったら、ランダム辞書から応答例をもってくる
+		if (USE_RANDOM_DIC) {
+			return Util::Select_Random($this->dictionary->random);
+		}
     }
 }
 
@@ -223,6 +231,11 @@ class MarkovResponder extends Responder {
 			// MarkovクラスのGenerateメソッドで文章を生成する
 			$res = $this->dictionary->markov->Generate(chop($keyword));
 			if ($res) { return $res; }
+		}
+		
+		// マッチする応答例がなかったら、ランダム辞書から応答例をもってくる
+		if (USE_RANDOM_DIC) {
+			return Util::Select_Random($this->dictionary->random);
 		}
 	}
 }

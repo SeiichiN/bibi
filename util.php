@@ -11,8 +11,15 @@ class Util {
 //		print mb_convert_encoding($text, "SJIS", "auto") . "\n";  // for Windows
 	}
 
+	// 配列からランダムに１つ取り出すメソッド
+	static function Select_Random($ary) {
+		return $ary[rand(0, count($ary) - 1)];
+    }
+
+    
+
     /**************************************************
-       ImageRequest:
+       ImageRequest -- ツイッターのプロフィールのイメージ画像を変更する
        以下のプログラムを使って作成した。-- by Seiichi Nukayama
 
 	   [POST account/update_profile_image]のお試しプログラム

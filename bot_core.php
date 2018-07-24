@@ -47,6 +47,8 @@ class Bot {
 	var $template_responder;
 	// MarkovResponderオブジェクトを格納する変数
 	var $markov_responder;
+	// 何も返さないResponderオブジェクトを格納する変数
+	var $null_responder;
 	
 	// Emotionオブジェクトを格納する変数
 	var $emotion;
@@ -95,6 +97,9 @@ class Bot {
 
 		// MarkovResponderオブジェクトの生成
 		$this->markov_responder = new MarkovResponder('Markov', $this->dic);
+
+		// nullレスポンダーオブジェクトの生成
+		$this->null_responder = new Responder('Null', $this->dic);
 		
 		// RandomResponderを規定のResponderにする
 		$this->responder = $this->rand_responder;
@@ -143,9 +148,13 @@ class Bot {
 	/* テキストをResponderオブジェクトに渡すメソッド */
 	function Speaks($input)
 	{
-		// 2つのResponderオブジェクトをランダムに切り替える
-		$this->responder = 
-			rand(1, 2) - 1 == 0 ? $this->time_responder : $this->rand_responder;
+		// 2つのResponderオブジェクトを切り替える
+		$hour = date("G");
+		if ($hour == 6 || $hour == 13 || $hour == 17 || $hour == 21) {
+			$this->responder = $this->time_responder;
+		} else {
+			$this->responder = $this->rand_responder;
+		}
 		
 		return $this->responder->Response($input);
 	}
@@ -153,17 +162,24 @@ class Bot {
 	/* テキストをResponderオブジェクトに渡すメソッド（リプライ用） */
 	function Conversation($input, $uid = NULL)
 	{
-		// GreetingResponderをResponder に設定する
-		// $this->responder = $this->greet_responder;
-		
-		// PatternResponderをResponder に設定する
-		// $this->responder = $this->pattern_responder;
+		// Responder をランダムに切り替える
+		$sel = rand(1, 100);
 
-		// TemplateResponderをResponder に設定する
-		// $this->responder = $this->template_responder;
-
-		// MarkovResponderをResponder に設定する
-		$this->responder = $this->markov_responder;
+		if ($sel > 0 && $sel < 40) {
+			$this->responder = $this->pattern_responder;
+		}
+		elseif ($sel >= 40 && $sel < 60) {
+			$this->responder = $this->template_responder;
+		}
+		elseif ($sel >= 60 && $sel < 80) {
+			$this->responder = $this->markov_responder;
+		}
+		elseif ($sel >= 80 && $sel < 90) {
+			$this->responder = $this->rand_responder;
+		}
+		else {
+			$this->responder = $this->null_responder;
+		}
 
 		// 宛先のユーザー名を消す
 		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));
