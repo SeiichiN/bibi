@@ -30,7 +30,7 @@ class Responder {
      */
 //	function MirrorResponse($text) {
 	function Response($text, $mood, $words) {
-		return $text;
+		return "";    // 何も返さないようにする
 	}
 
 	/* 名前を返すメソッド */

@@ -12,7 +12,7 @@ class Util {
 	}
 
     /**************************************************
-       ImageRequest:
+       ImageRequest -- ツイッターのプロフィールのイメージ画像を変更する
        以下のプログラムを使って作成した。-- by Seiichi Nukayama
 
 	   [POST account/update_profile_image]のお試しプログラム
