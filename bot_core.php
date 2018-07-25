@@ -49,6 +49,8 @@ class Bot {
 	var $markov_responder;
 	// 何も返さないResponderオブジェクトを格納する変数
 	var $null_responder;
+	// HoroscopeResponderオブジェクトを格納する変数
+	var $horo_responder;
 	
 	// Emotionオブジェクトを格納する変数
 	var $emotion;
@@ -101,7 +103,10 @@ class Bot {
 		// nullレスポンダーオブジェクトの生成
 		$this->null_responder = new Responder('Null', $this->dic);
 		
-		// RandomResponderを規定のResponderにする
+		// HoroscopeResponderオブジェクトの生成
+		$this->horo_responder = new HoroscopeResponder('Horoscope');
+
+        // RandomResponderを規定のResponderにする
 		$this->responder = $this->rand_responder;
 	}
 
@@ -160,7 +165,7 @@ class Bot {
 	}
 
 	/* テキストをResponderオブジェクトに渡すメソッド（リプライ用） */
-	function Conversation($input, $uid = NULL)
+	function Conversation($input, $uid = NULL, $user = NULL)
 	{
 		// Responder をランダムに切り替える
 		$sel = rand(1, 100);
@@ -181,22 +186,34 @@ class Bot {
 			$this->responder = $this->null_responder;
 		}
 
+        $flg = 1;  // 処理をスキップするためのフラグ
+
+        // 「@ボットのユーザー名 星座?」のパターンにマッチしたら
+        if (preg_match("/@" . $user . ".*座\?/", $input)) {
+            // ResponderをHoroscopeResponderにする
+            $this->responder = $this->horo_responder;
+            $flg = 0;
+        }
+
 		// 宛先のユーザー名を消す
 		$input = trim(preg_replace("/@[a-zA-Z0-9_]+/", "", $input));
 
-		// パターンマッチをおこない、感情を変動させる
-		$this->emotion->Update($input, $uid);
+        // $flgが「1」だったら処理を実行する
+        if ($flg) {
+            // パターンマッチをおこない、感情を変動させる
+		    $this->emotion->Update($input, $uid);
 
-		// 形態素解析の結果を取得する
-		$m = new Yahoo_morph();
-		$words = $m->Request($input);
+		    // 形態素解析の結果を取得する
+		    $m = new Yahoo_morph();
+		    $words = $m->Request($input);
 
-		// Studyメソッドにテキストを渡して学習する
-		// 引数 $words で形態素解析の結果を渡す
-		$this->dic->Study($input, $words);
-
-		$this->save();  // 辞書ファイルの保存
-		
+		    // Studyメソッドにテキストを渡して学習する
+		    // 引数 $words で形態素解析の結果を渡す
+		    $this->dic->Study($input, $words);
+            
+		    $this->save();  // 辞書ファイルの保存
+		}
+        
 		/**
 		 * Responseを返す
 		 * @param: string $input -- 発言

@@ -266,13 +266,14 @@ class HoroscopeResponder extends Responder {
     /**
      * 星占いのRSSを取得して結果を返すメソッド
      *
-     * @param: string $text -- 発言
+     * @param: string $text -- 発言（ex.獅子座?）
      */
-    function Response($text) {
+    function Response($text, $mood, $words) {
 
         $text = str_replace("?", "", $text);
 
         // リクエストパラメータの設定
+		// 星座のラテン名を求める
         $sign = array_search($text, $this->constellation);
 
         $url = 'http://fortune.jp.msn.com/rss.aspx';
@@ -282,4 +283,24 @@ class HoroscopeResponder extends Responder {
 		   MSN 占い - 12星座ランキング
 		   http://fortune.jp.msn.com/rss.aspx?rsstype=12rank
          */
+
+		$params = array(
+			'rsstype' => '12rank',
+			'sign1' => $sign
+		);
+
+        // リクエスト
+        $api = new Web_API('Horoscope');
+        $res = $api->Request($url, $params);
+
+		var_dump($res); die();
 		
+        // RSSをパースして応答テキストを生成する
+        foreach ($rss->channel as $r) {
+            $res =
+                $r->title ." ".$r->item->title.$r->item->description.$r->item->link;
+        }
+        return $res;
+    }
+}
+
