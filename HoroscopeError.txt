@@ -1,0 +1,45 @@
+>>> スクリーン名=> saigonohito $text=> @bot_billie 獅子座?
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:108: parser error : Opening and ending tag mismatch: input line 106 and div in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():  </div> in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():        ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:109: parser error : Opening and ending tag mismatch: input line 105 and form in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): </form> in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():        ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:112: parser error : Opening and ending tag mismatch: form line 101 and div in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): </div> in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():       ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:672: parser error : EntityRef: expecting ';' in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         var url = '//www.bizographics.com/collect/?fmt=gif&pid=7850'; in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                                               ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:673: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         if (headData && headData.clientSettings && headData.clientSettings.stati in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                       ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:673: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         if (headData && headData.clientSettings && headData.clientSettings.stati in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                        ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:673: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         if (headData && headData.clientSettings && headData.clientSettings.stati in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                                  ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:673: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         if (headData && headData.clientSettings && headData.clientSettings.stati in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                                   ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:677: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():             url = url.replace(/([?&]rid=)[^&#]*/i, "$1" + rid); in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                    ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:677: parser error : CharRef: invalid decimal value in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():             url = url.replace(/([?&]rid=)[^&#]*/i, "$1" + rid); in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                              ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:677: parser error : xmlParseCharRef: invalid xmlChar value 0 in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():             url = url.replace(/([?&]rid=)[^&#]*/i, "$1" + rid); in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                              ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:679: parser error : xmlParseEntityRef: no name in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():         new Image().src = url.replace(/&amp;/g, '&'); in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():                                                   ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:689: parser error : Opening and ending tag mismatch: div line 27 and body in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): </body> in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file():        ^ in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:690: parser error : Opening and ending tag mismatch: div line 26 and html in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:690: parser error : Premature end of data in tag body line 22 in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  simplexml_load_file(): http://fortune.jp.msn.com/rss.aspx?rsstype=12luck&sign1=leo:690: parser error : Premature end of data in tag html line 3 in /home/se-ichi/public_html/xrea/public_html/bibi/util.php on line 265
+PHP Warning:  Invalid argument supplied for foreach() in /home/se-ichi/public_html/xrea/public_html/bibi/responder.php on line 296
+レスポンス文=> （空） 

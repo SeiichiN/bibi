@@ -2,10 +2,13 @@
 1	%noun%に行きたくなってきた。
 1	やはり謙虚さが一番%noun%なんかな。
 1	%noun%も暑くなりそうですね。
+1	%noun%?
 3	%noun%の%noun%で%noun%を叫ぶ
 3	%noun%の%noun%にも%noun%年
 3	I %noun% %noun% %noun%.
+3	%noun%と%noun%の%noun%。
 2	%noun%よ、%noun%を抱け
 2	%noun%、%noun%になるとすごく眠くなる。暑さのせいかな。
 2	%noun%がおわると、やはり疲れてるな～と思う。で、%noun%が欲しくなる。
 6	%noun%って、同じくらいの%noun%の%noun%%noun%の、約%noun%倍以上の%noun%て感じやな。
+5	%noun%で%noun%%noun%。うっかりしてた。こんな%noun%、とても乗れん。%noun%しよう。

@@ -256,6 +256,9 @@ class Web_API {
 
 		// パラメータを「&」で連結する
 		$req = $url . "?" . join('&', $encoded_params);
+
+		if (DEBUG_MODE) echo "\$req-> $req \n";
+		
 		// Load_fileメソッドの実行結果を返す
 		return $this->res = $this->Load_file($req);
 	}
@@ -276,3 +279,15 @@ class Get_content extends Web_API {
 		return file_get_contents($req);
 	}
 }
+
+/**
+ * Get_html -- Web_APIクラスを継承
+ */
+class Get_html extends Web_API {
+
+    function Load_file($req) {
+        return $req;
+    }
+}
+
+    

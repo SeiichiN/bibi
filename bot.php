@@ -150,7 +150,7 @@ foreach ($mentions as $Timeline) {
 		if (MOOD_MODE) { $myBot->emotion->User_mood($uid); }
 		
 		// 送信する文字列を取得する（いろんな辞書をランダムに切り替える）
-		$txt = $myBot->Conversation($text, $uid);  // <-- p122  $user となっているけど、こっちでは？
+		$txt = $myBot->Conversation($text, $uid, $user);  // <-- p122  $user となっているけど、こっちでは？
 		
 
 		// コマンドプロンプトでの出力確認用

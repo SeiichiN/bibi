@@ -1,5 +1,7 @@
 <?php // マルコフ辞書
 
+// 指定したファイルを読み込んで、マルコフ辞書を作成するユーティリティ
+
 /*
   Usage:  $ php test.php anotokino_ojikun.txt
 

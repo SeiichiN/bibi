@@ -240,3 +240,139 @@ class MarkovResponder extends Responder {
 	}
 }
 		
+/* HoroscopeResponderクラスの定義（Responderクラスを継承） */
+class HoroscopeResponder extends Responder {
+
+	var $constellation;
+
+	function __construct($name) {
+		$this->name = $name;
+		$this->constellation = array(
+			"aries" => "牡羊座",
+			"taurus" => "牡牛座",
+			"gemini" => "双子座",
+			"cancer" => "蟹座",
+			"leo" => "獅子座",
+			"virgo" => "乙女座",
+			"libro" => "天秤座",
+			"scorpio" => "蠍座",
+			"sagittarius" => "射手座",
+			"capricorn" => "山羊座",
+			"aquarius" => "水瓶座",
+			"pisces" => "魚座"
+		);
+	}
+
+    /**
+     * 星占いのRSSを取得して結果を返すメソッド
+     * うまくいかないので、とりあえず開発中止。
+     * (2018.07.28)
+     *
+     * @param: string $text -- 発言（ex.獅子座?）
+     */
+    function Response($text, $mood = NULL, $words = NULL) {
+
+        if (DEBUG_MODE) echo "Rresponderメソッドだよ。 \n";
+        
+        $text = str_replace("?", "", $text);
+
+        // リクエストパラメータの設定
+		// 星座のラテン名を求める
+        $sign = array_search($text, $this->constellation);
+
+        // $url = 'http://fortune.jp.msn.com/rss.aspx';
+
+	    $url = 'https://fortune.yahoo.co.jp/12astro/' . $sign;
+
+        if (DEBUG_MODE) echo "$url \n";
+        
+        $dom = new DOMDocument;
+        @$dom->loadHTML($url);
+        $xpath = new DOMXPath($dom);
+//        $nodes = $xpath->query('//div[@class="yftn12a-md48"]/dl');
+        $nodes = $xpath->query('//div[@id="lnk01"]');
+        var_dump($nodes);
+        foreach ($nodes as $class) {
+            echo $class->nodeValue;
+        }
+        /* foreach ($dom->getElementsByClassName('yftn12a-md48') as $node) {
+         *     //echo $dom->saveHtml($node), PHP_EOL;
+         *    
+         * }*/
+        die();
+
+		/*
+           MSN 占い - 12星座ランキング
+		   MSN 占い - 12星座ランキング
+		   http://fortune.jp.msn.com/rss.aspx?rsstype=12rank
+         */
+
+		$params = array(
+			'rsstype' => '12rank',
+			'sign1' => $sign
+		);
+
+        // リクエスト
+        $api = new Web_API('Horoscope');
+        $res = $api->Request($url, $params);
+
+		var_dump($res); die();
+		
+        // RSSをパースして応答テキストを生成する
+        foreach ($rss->channel as $r) {
+            $res =
+                $r->title ." ".$r->item->title.$r->item->description.$r->item->link;
+        }
+        return $res;
+    }
+}
+
+// OmikujiResponderクラスの定義（Responderクラスを継承）
+class OmikujiResponder extends Responder {
+	
+    function __construct($name) {
+        $this->name = $name;
+    }
+
+    function Response($text, $mood = NULL, $words = NULL) {
+
+		if (DEBUG_MODE) { echo ">>> $this->name だよ。 \n"; }
+		
+        $strArray = explode("?", $text);
+        $text1 = $strArray[0];
+        $text2 = $strArray[1];
+
+        // リクエストパラメータの設定
+        $url = 'https://fortune.yahoo.co.jp/omikuji/result.html';
+        // 男性用は「m」、女性用は「f」と設定する。
+        if ($text2 == 'm' || $text2 =='男' || $text2 == '男性') {
+            $params = array('sex' => 'm');
+        } 
+        elseif ($text2 == 'f' || $text2 =='女' || $text2 == '女性') {
+            $params = array('sex' => 'f');
+        }
+        else {
+            $params = array('sex' => 'f');
+        }
+
+        // リクエスト
+//        $api = new Get_content('Omikuji');
+        $api = new Get_content('Omikuji');
+        $buf = mb_convert_encoding($api->Request($url, $params), 'UTF-8', 'AUTO');
+
+        // 「今日のあなたの」にマッチするテキストを配列に格納する
+        preg_match_all("/今日のあなたの.*/", $buf, $m);
+
+        $res = array();
+		foreach ($m[0] as $v) {
+			$v = preg_replace("/(<\/td>)?(<\/tr>)?/", "", $v);
+			$s = preg_split("/。/", $v);
+			$w = $s[0] . "。" . $s[1] . "。"; 
+			array_push($res, $w);
+
+		}
+        return Util::Select_Random($res);
+    }
+}
+
+
