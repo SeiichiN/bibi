@@ -2,6 +2,7 @@
 1	%noun%に行きたくなってきた。
 1	やはり謙虚さが一番%noun%なんかな。
 1	%noun%も暑くなりそうですね。
+1	%noun%?
 3	%noun%の%noun%で%noun%を叫ぶ
 3	%noun%の%noun%にも%noun%年
 3	I %noun% %noun% %noun%.
