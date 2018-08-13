@@ -41,6 +41,8 @@ $pass_list = $myBot->ReadData("Pass");
 
 if (DEBUG_MODE) echo '============== タイムライン => =================', "\n";
 
+$textarry = array();
+
 // タイムラインの出力
 foreach ($mentions as $Timeline) {
 
@@ -73,10 +75,14 @@ foreach ($mentions as $Timeline) {
     // ユーザーIDの取得（文字列で取得）
 	$uid = $Timeline->user->id_str;
 	// if(DEBUG_MODE){	echo 'ユーザーID($uid)=> ', $uid, "\n";	}
-	
+
+	// ユーザーのつぶやきを取得
 	// つぶやき内容の余分なスペースを消し、半角カナを全角カナ、
 	// 全角英数を半角英数に変換する
 	$text = mb_convert_kana(trim($Timeline->text), "rnKHV", "utf-8");
+
+	// 発言の冒頭言葉の配列をつくる
+	array_push($textarry, substr($text, 0, 10));
 	
 	// ボット自身の発言、RT、QTに反応しないようにする
 	if ($screen_name == $user || preg_match("/(R|Q)T( |:)/", $text)) {
@@ -219,9 +225,16 @@ $myBot->DeleteFile("Count", 1800);
 // 送信する文字列を設定する
 // $txt = "こんにちは";
 
+// つぶやきの先頭10文字の配列のどれかを rand で取得
+$txt = $textarry[rand(0, count($textarry) - 1)];
+if (DEBUG_MODE) { echo ">>>>> このつぶやきに反応=> ", $txt, "\n";}
+
 // 送信する文字列を取得する
 // Speaksは、time/randomに設定してある。
-$mytxt = $myBot->Speaks("");
+//$mytxt = $myBot->Speaks($txt);
+$mytxt = $myBot->Conversation($txt);
+if (DEBUG_MODE) {echo ">>>>> これを発言=> ", $mytxt, "\n";}
+
 
 // エラーレベルを変更
 $level_org = error_reporting();
